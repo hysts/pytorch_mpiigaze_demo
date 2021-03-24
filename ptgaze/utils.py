@@ -227,11 +227,13 @@ def update_default_config(config: yacs.config.CfgNode,
             config.mode = 'MPIIGaze'
             model_path = _download_eye_model()
             config.gaze_estimator.checkpoint = model_path.as_posix()
+            _set_eye_default_camera(config)
         elif args.mode == 'face':
             config.mode = 'MPIIFaceGaze'
             config.model.name = 'resnet_simple'
             model_path = _download_face_model()
             config.gaze_estimator.checkpoint = model_path.as_posix()
+            _set_face_default_camera(config)
         else:
             raise ValueError
         logger.debug('Set config.gaze_estimator.checkpoint')
@@ -281,15 +283,8 @@ def update_default_config(config: yacs.config.CfgNode,
 
 
 def update_config(config: yacs.config.CfgNode) -> None:
-    if config.mode == 'MPIIGaze':
-        _set_eye_default_camera(config)
-    elif config.mode == 'MPIIFaceGaze':
-        _set_face_default_camera(config)
-    else:
-        raise ValueError
     _update_camera_config(config)
     _download_dlib_pretrained_model(config)
     _expanduser_all(config)
     _check_path_all(config)
-
     config.freeze()
