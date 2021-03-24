@@ -136,7 +136,7 @@ def _update_camera_config(config: yacs.config.CfgNode) -> None:
                           'dummy parameters from the video size.')
             _generate_dummy_camera_params(config)
         else:
-            logger.debug('Bothe config.demo.image_path and '
+            logger.debug('Both config.demo.image_path and '
                          'config.demo.video_path are not specified.')
             raise ValueError(
                 'No input found. config.demo.use_camera is False and '
