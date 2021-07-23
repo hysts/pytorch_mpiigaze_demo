@@ -5,9 +5,11 @@ import numpy as np
 import torch
 import yacs.config
 
-from ptgaze import (MODEL3D, Camera, Face, FacePartsName, GazeEstimationMethod,
-                    HeadPoseNormalizer, LandmarkEstimator, create_model,
-                    create_transform)
+from .common import MODEL3D, Camera, Face, FacePartsName
+from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
+from .models import create_model
+from .transforms import create_transform
+from .types import GazeEstimationMethod
 
 logger = logging.getLogger(__name__)
 

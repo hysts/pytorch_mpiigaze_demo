@@ -6,7 +6,7 @@ import torch
 import torchvision
 import yacs.config
 
-from ptgaze import GazeEstimationMethod
+from .types import GazeEstimationMethod
 
 
 def create_transform(config: yacs.config.CfgNode) -> Any:

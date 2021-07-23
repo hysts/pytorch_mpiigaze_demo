@@ -6,7 +6,7 @@ import face_alignment.detection.sfd
 import numpy as np
 import yacs.config
 
-from ptgaze import Face
+from ..common import Face
 
 
 class LandmarkEstimator:

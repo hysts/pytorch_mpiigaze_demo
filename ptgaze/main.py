@@ -1,9 +1,9 @@
 import argparse
 import logging
 
-from ptgaze import get_default_config
-from ptgaze.demo import Demo
-from ptgaze.utils import update_config, update_default_config
+from .config import get_default_config
+from .demo import Demo
+from .utils import update_config, update_default_config
 
 logger = logging.getLogger(__name__)
 

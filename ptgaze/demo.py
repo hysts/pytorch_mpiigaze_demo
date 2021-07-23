@@ -7,8 +7,9 @@ import cv2
 import numpy as np
 import yacs.config
 
-from ptgaze import (Face, FacePartsName, GazeEstimationMethod, GazeEstimator,
-                    Visualizer)
+from .common import Face, FacePartsName, Visualizer
+from .gaze_estimator import GazeEstimator
+from .types import GazeEstimationMethod
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
