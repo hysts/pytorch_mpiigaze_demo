@@ -1,22 +1,13 @@
-from typing import List
-
 import logging
+from typing import List
 
 import numpy as np
 import torch
 import yacs.config
 
-from ptgaze import (
-    Camera,
-    Face,
-    FacePartsName,
-    GazeEstimationMethod,
-    HeadPoseNormalizer,
-    LandmarkEstimator,
-    MODEL3D,
-    create_model,
-    create_transform,
-)
+from ptgaze import (MODEL3D, Camera, Face, FacePartsName, GazeEstimationMethod,
+                    HeadPoseNormalizer, LandmarkEstimator, create_model,
+                    create_transform)
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,7 @@
-from typing import Optional
-
 import datetime
 import logging
 import pathlib
+from typing import Optional
 
 import cv2
 import numpy as np

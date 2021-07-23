@@ -1,8 +1,8 @@
-from .common import (Camera, Eye, Face, FaceParts, FacePartsName, MODEL3D,
+from .common import (MODEL3D, Camera, Eye, Face, FaceParts, FacePartsName,
                      Visualizer)
 from .config import get_default_config
+from .gaze_estimator import GazeEstimator
 from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
 from .models import create_model
-from .types import GazeEstimationMethod
 from .transforms import create_transform
-from .gaze_estimator import GazeEstimator
+from .types import GazeEstimationMethod

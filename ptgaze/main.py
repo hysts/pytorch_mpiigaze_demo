@@ -3,7 +3,7 @@ import logging
 
 from ptgaze import get_default_config
 from ptgaze.demo import Demo
-from ptgaze.utils import update_default_config, update_config
+from ptgaze.utils import update_config, update_default_config
 
 logger = logging.getLogger(__name__)
 
