@@ -6,8 +6,8 @@ face_detector:
   mode: dlib
 gaze_estimator:
   checkpoint: ~/.ptgaze/models/mpiigaze_resnet_preact.pth
-  camera_params: ''
-  normalized_camera_params: ''
+  camera_params: ptgaze/data/calib/sample_params.yaml
+  normalized_camera_params: ptgaze/data/calib/normalized_camera_params_mpiigaze.yaml
   normalized_camera_distance: 0.6
 demo:
   use_camera: True

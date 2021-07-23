@@ -10,9 +10,9 @@ model:
 face_detector:
   mode: dlib
 gaze_estimator:
-  checkpoint: ~/.ptgaze/data/models/mpiifacegaze_resnet_simple.pth
-  camera_params: ''
-  normalized_camera_params: ''
+  checkpoint: ~/.ptgaze/models/mpiifacegaze_resnet_simple.pth
+  camera_params: ptgaze/data/calib/sample_params.yaml
+  normalized_camera_params: ptgaze/data/calib/normalized_camera_params_mpiifacegaze.yaml
   normalized_camera_distance: 1.0
 demo:
   use_camera: True

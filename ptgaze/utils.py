@@ -155,7 +155,7 @@ def _update_camera_config(config: yacs.config.CfgNode) -> None:
 def _set_eye_default_camera(config: yacs.config.CfgNode) -> None:
     logger.debug('Called _set_eye_default_camera()')
     package_root = pathlib.Path(__file__).resolve().parent
-    filename = 'data/calib/normalized_camera_params_eye.yaml'
+    filename = 'data/calib/normalized_camera_params_mpiigaze.yaml'
     default_params = package_root / filename
     config.gaze_estimator.normalized_camera_params = default_params.as_posix()
     config.gaze_estimator.normalized_camera_distance = 0.6
@@ -166,7 +166,7 @@ def _set_eye_default_camera(config: yacs.config.CfgNode) -> None:
 def _set_face_default_camera(config: yacs.config.CfgNode) -> None:
     logger.debug('Called _set_face_default_camera()')
     package_root = pathlib.Path(__file__).resolve().parent
-    filename = 'data/calib/normalized_camera_params_face.yaml'
+    filename = 'data/calib/normalized_camera_params_mpiifacegaze.yaml'
     default_params = package_root / filename
     config.gaze_estimator.normalized_camera_params = default_params.as_posix()
     config.gaze_estimator.normalized_camera_distance = 1.0
