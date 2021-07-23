@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 import torch
-import yacs.config
+from omegaconf import DictConfig
 
 from .common import MODEL3D, Camera, Face, FacePartsName
 from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class GazeEstimator:
     EYE_KEYS = [FacePartsName.REYE, FacePartsName.LEYE]
 
-    def __init__(self, config: yacs.config.CfgNode):
+    def __init__(self, config: DictConfig):
         self._config = config
 
         self.camera = Camera(config.gaze_estimator.camera_params)
@@ -45,7 +45,7 @@ class GazeEstimator:
     def estimate_gaze(self, image: np.ndarray, face: Face) -> None:
         MODEL3D.estimate_head_pose(face, self.camera)
         MODEL3D.compute_3d_pose(face)
-        MODEL3D.compute_face_eye_centers(face)
+        MODEL3D.compute_face_eye_centers(face, self._config.mode)
 
         if self._config.mode == 'MPIIGaze':
             for key in self.EYE_KEYS:

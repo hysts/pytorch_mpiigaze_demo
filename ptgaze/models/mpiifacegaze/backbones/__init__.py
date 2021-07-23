@@ -1,10 +1,10 @@
 import importlib
 
 import torch.nn as nn
-import yacs.config
+from omegaconf import DictConfig
 
 
-def create_backbone(config: yacs.config.CfgNode) -> nn.Module:
+def create_backbone(config: DictConfig) -> nn.Module:
     backbone_name = config.model.backbone.name
     module = importlib.import_module(
         f'ptgaze.models.mpiifacegaze.backbones.{backbone_name}')

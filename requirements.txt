@@ -1,9 +1,9 @@
-numpy
-scipy
-opencv-python<4.2.0
 dlib
 face_alignment
+numpy
+omegaconf
+opencv-python<4.2.0
+pyyaml
+scipy
 torch>=1.4.0
 torchvision>=0.5.0
-pyyaml
-yacs>=0.1.6

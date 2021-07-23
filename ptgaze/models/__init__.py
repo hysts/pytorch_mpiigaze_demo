@@ -2,10 +2,10 @@ import importlib
 
 import timm
 import torch
-import yacs.config
+from omegaconf import DictConfig
 
 
-def create_model(config: yacs.config.CfgNode) -> torch.nn.Module:
+def create_model(config: DictConfig) -> torch.nn.Module:
     mode = config.mode
     if mode in ['MPIIGaze', 'MPIIFaceGaze']:
         module = importlib.import_module(

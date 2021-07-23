@@ -3,13 +3,13 @@ from typing import Optional, Tuple, Union
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import yacs.config
+from omegaconf import DictConfig
 
 from .backbones import create_backbone
 
 
 class Model(nn.Module):
-    def __init__(self, config: yacs.config.CfgNode):
+    def __init__(self, config: DictConfig):
         super().__init__()
         self.feature_extractor = create_backbone(config)
         n_channels = self.feature_extractor.n_features

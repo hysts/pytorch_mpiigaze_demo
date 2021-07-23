@@ -97,11 +97,12 @@ class FaceModel:
         [0., 0.03791103, 0.0180805],
         [-0.00771924, 0.03711846, 0.01940396],
     ],
-                                     dtype=np.float)
+                                     dtype=np.float64)
 
     REYE_INDICES: np.ndarray = np.array([36, 39])
     LEYE_INDICES: np.ndarray = np.array([42, 45])
     MOUTH_INDICES: np.ndarray = np.array([48, 54])
+    NOSE_INDICES: np.ndarray = np.array([31, 35])
 
     CHIN_INDEX: int = 8
     NOSE_INDEX: int = 30
@@ -135,17 +136,24 @@ class FaceModel:
         rot = face.head_pose_rot.as_matrix()
         face.model3d = self.LANDMARKS @ rot.T + face.head_position
 
-    def compute_face_eye_centers(self, face: Face) -> None:
+    def compute_face_eye_centers(self, face: Face, mode: str) -> None:
         """Compute the centers of the face and eyes.
 
-        The face center is defined as the average coordinates of the six
-        points at the corners of both eyes and the mouth. The eye
-        centers are defined as the average coordinates of the corners of
-        each eye.
+        In the case of MPIIFaceGaze, the face center is defined as the
+        average coordinates of the six points at the corners of both
+        eyes and the mouth. In the case of ETH-XGaze, it's defined as
+        the average coordinates of the six points at the corners of both
+        eyes and the nose. The eye centers are defined as the average
+        coordinates of the corners of each eye.
         """
-        face.center = face.model3d[np.concatenate(
-            [self.REYE_INDICES, self.LEYE_INDICES,
-             self.MOUTH_INDICES])].mean(axis=0)
+        if mode == 'ETH-XGaze':
+            face.center = face.model3d[np.concatenate(
+                [self.REYE_INDICES, self.LEYE_INDICES,
+                 self.NOSE_INDICES])].mean(axis=0)
+        else:
+            face.center = face.model3d[np.concatenate(
+                [self.REYE_INDICES, self.LEYE_INDICES,
+                 self.MOUTH_INDICES])].mean(axis=0)
         face.reye.center = face.model3d[self.REYE_INDICES].mean(axis=0)
         face.leye.center = face.model3d[self.LEYE_INDICES].mean(axis=0)
 

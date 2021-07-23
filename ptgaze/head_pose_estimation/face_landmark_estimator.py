@@ -4,18 +4,18 @@ import dlib
 import face_alignment
 import face_alignment.detection.sfd
 import numpy as np
-import yacs.config
+from omegaconf import DictConfig
 
 from ..common import Face
 
 
 class LandmarkEstimator:
-    def __init__(self, config: yacs.config.CfgNode):
+    def __init__(self, config: DictConfig):
         self.mode = config.face_detector.mode
         if self.mode == 'dlib':
             self.detector = dlib.get_frontal_face_detector()
             self.predictor = dlib.shape_predictor(
-                config.face_detector.dlib.model)
+                config.face_detector.dlib_model_path)
         elif self.mode == 'face_alignment_dlib':
             self.detector = dlib.get_frontal_face_detector()
             self.predictor = face_alignment.FaceAlignment(

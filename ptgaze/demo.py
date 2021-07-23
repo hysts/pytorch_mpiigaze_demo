@@ -5,7 +5,7 @@ from typing import Optional
 
 import cv2
 import numpy as np
-import yacs.config
+from omegaconf import DictConfig
 
 from .common import Face, FacePartsName, Visualizer
 from .gaze_estimator import GazeEstimator
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Demo:
     QUIT_KEYS = {27, ord('q')}
 
-    def __init__(self, config: yacs.config.CfgNode):
+    def __init__(self, config: DictConfig):
         self.config = config
         self.gaze_estimator = GazeEstimator(config)
         self.visualizer = Visualizer(self.gaze_estimator.camera)

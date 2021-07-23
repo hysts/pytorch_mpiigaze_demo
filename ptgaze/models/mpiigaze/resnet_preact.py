@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import yacs.config
+from omegaconf import DictConfig
 
 
 class BasicBlock(nn.Module):
@@ -44,7 +44,7 @@ class BasicBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, config: yacs.config.CfgNode):
+    def __init__(self, config: DictConfig):
         super().__init__()
 
         depth = 8

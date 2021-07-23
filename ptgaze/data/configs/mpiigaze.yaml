@@ -4,18 +4,19 @@ model:
   name: resnet_preact
 face_detector:
   mode: dlib
+  dlib_model_path: ~/.ptgaze/dlib/shape_predictor_68_face_landmarks.dat
 gaze_estimator:
   checkpoint: ~/.ptgaze/models/mpiigaze_resnet_preact.pth
   camera_params: ptgaze/data/calib/sample_params.yaml
-  normalized_camera_params: ptgaze/data/calib/normalized_camera_params_mpiigaze.yaml
+  normalized_camera_params: ptgaze/data/normalized_camera_params/mpiigaze.yaml
   normalized_camera_distance: 0.6
 demo:
   use_camera: True
   display_on_screen: True
   wait_time: 1
-  image_path: ''
-  video_path: ''
-  output_dir: ''
+  image_path: null
+  video_path: null
+  output_dir: null
   output_file_extension: avi
   head_pose_axis_length: 0.05
   gaze_visualization_length: 0.05
