@@ -207,7 +207,10 @@ class Demo:
             reye = face.reye.normalized_image
             leye = face.leye.normalized_image
             normalized = np.hstack([reye, leye])
-        elif self.config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
+        elif self.config.mode in [
+                GazeEstimationMethod.MPIIFaceGaze.name,
+                GazeEstimationMethod.ETHXGaze.name
+        ]:
             normalized = face.normalized_image
         else:
             raise ValueError
@@ -225,7 +228,10 @@ class Demo:
                 pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
                 logger.info(
                     f'[{key.name.lower()}] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
-        elif self.config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
+        elif self.config.mode in [
+                GazeEstimationMethod.MPIIFaceGaze.name,
+                GazeEstimationMethod.ETHXGaze.name
+        ]:
             self.visualizer.draw_3d_line(
                 face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))

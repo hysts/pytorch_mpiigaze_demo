@@ -56,6 +56,11 @@ class GazeEstimator:
         elif self._config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
             self._head_pose_normalizer.normalize(image, face)
             self._run_mpiifacegaze_model(face)
+        elif self._config.mode == GazeEstimationMethod.ETHXGaze.name:
+            self._head_pose_normalizer.normalize(image, face)
+            self._run_ethxgaze_model(face)
+        else:
+            raise ValueError
 
     @torch.no_grad()
     def _run_mpiigaze_model(self, face: Face) -> None:
@@ -91,6 +96,19 @@ class GazeEstimator:
 
     @torch.no_grad()
     def _run_mpiifacegaze_model(self, face: Face) -> None:
+        image = self._transform(face.normalized_image).unsqueeze(0)
+
+        device = torch.device(self._config.device)
+        image = image.to(device)
+        prediction = self._gaze_estimation_model(image)
+        prediction = prediction.cpu().numpy()
+
+        face.normalized_gaze_angles = prediction[0]
+        face.angle_to_vector()
+        face.denormalize_gaze_vector()
+
+    @torch.no_grad()
+    def _run_ethxgaze_model(self, face: Face) -> None:
         image = self._transform(face.normalized_image).unsqueeze(0)
 
         device = torch.device(self._config.device)
