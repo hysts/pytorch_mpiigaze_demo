@@ -22,27 +22,6 @@ class Model(nn.Module):
         # This model assumes the input image size is 224x224.
         self.fc = nn.Linear(n_channels * 14**2, 2)
 
-        self._register_hook()
-        self._initialize_weight()
-
-    def _initialize_weight(self) -> None:
-        nn.init.kaiming_normal_(self.conv.weight)
-        nn.init.zeros_(self.conv.bias)
-        nn.init.xavier_normal_(self.fc.weight)
-        nn.init.zeros_(self.fc.bias)
-
-    def _register_hook(self):
-        n_channels = self.feature_extractor.n_features
-
-        def hook(
-            module: nn.Module, grad_in: Union[Tuple[torch.Tensor, ...],
-                                              torch.Tensor],
-            grad_out: Union[Tuple[torch.Tensor, ...], torch.Tensor]
-        ) -> Optional[torch.Tensor]:
-            return tuple(grad / n_channels for grad in grad_in)
-
-        self.conv.register_backward_hook(hook)
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.feature_extractor(x)
         y = F.relu(self.conv(x))

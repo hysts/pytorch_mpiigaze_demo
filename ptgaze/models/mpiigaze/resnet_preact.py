@@ -4,16 +4,6 @@ import torch.nn.functional as F
 import yacs.config
 
 
-def initialize_weights(module: torch.nn.Module) -> None:
-    if isinstance(module, nn.Conv2d):
-        nn.init.kaiming_normal_(module.weight, mode='fan_out')
-    elif isinstance(module, nn.BatchNorm2d):
-        nn.init.ones_(module.weight)
-        nn.init.zeros_(module.bias)
-    elif isinstance(module, nn.Linear):
-        nn.init.zeros_(module.bias)
-
-
 class BasicBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, stride: int):
         super().__init__()
@@ -96,8 +86,6 @@ class Model(nn.Module):
                 torch.zeros(*input_shape)).view(-1).size(0)
 
         self.fc = nn.Linear(self.feature_size + 2, 2)
-
-        self.apply(initialize_weights)
 
     @staticmethod
     def _make_stage(in_channels: int, out_channels: int, n_blocks: int,
