@@ -3,16 +3,17 @@
 With this program, you can run gaze estimation on images and videos.
 By default, the video from a webcam will be used.
 
-![MPIIGaze video result](figures/mpiigaze_video.gif)
-![MPIIFaceGaze video result](figures/mpiifacegaze_video.gif)
+![ETH-XGaze video01 result](assets/results/eth-xgaze_video01.gif)
+![ETH-XGaze video02 result](assets/results/eth-xgaze_video02.gif)
+![ETH-XGaze video03 result](assets/results/eth-xgaze_video03.gif)
 
-(The original video is from [this public domain](https://www.pexels.com/video/woman-in-a-group-having-a-drink-while-listening-3201742/).)
+![MPIIGaze video00 result](assets/results/mpiigaze_video00.gif)
+![MPIIFaceGaze video00 result](assets/results/mpiifacegaze_video00.gif)
 
-![MPIIGaze image result](figures/mpiigaze_image.jpg)
+![MPIIGaze image00 result](assets/results/mpiigaze_image00.jpg)
 
-(The original image is from [this public domain](https://www.pexels.com/photo/photography-of-a-beautiful-woman-smiling-1024311/).)
-
-To train a model, use [this repository](https://github.com/hysts/pytorch_mpiigaze).
+To train a model for MPIIGaze and MPIIFaceGaze,
+use [this repository](https://github.com/hysts/pytorch_mpiigaze).
 
 ## Quick start
 
@@ -35,7 +36,7 @@ ptgaze --mode eth-xgaze
 
 ```
 usage: ptgaze [-h] [--config CONFIG] [--mode {mpiigaze,mpiifacegaze,eth-xgaze}]
-              [--face-detector {dlib,face_alignment_dlib,face_alignment_sfd}]
+              [--face-detector {dlib,face_alignment_dlib,face_alignment_sfd,mediapipe}]
               [--device {cpu,cuda}] [--image IMAGE] [--video VIDEO] [--camera CAMERA]
               [--output-dir OUTPUT_DIR] [--ext {avi,mp4}] [--no-screen] [--debug]
 
@@ -49,8 +50,9 @@ optional arguments:
                         With 'mpiigaze', MPIIGaze model will be used. With 'mpiifacegaze',
                         MPIIFaceGaze model will be used. With 'eth-xgaze', ETH-XGaze model will be
                         used. (default: 'eth-xgaze')
-  --face-detector {dlib,face_alignment_dlib,face_alignment_sfd}
-                        The method used to detect faces and find face landmarks (default: 'dlib')
+  --face-detector {dlib,face_alignment_dlib,face_alignment_sfd,mediapipe}
+                        The method used to detect faces and find face landmarks (default:
+                        'mediapipe')
   --device {cpu,cuda}   Device used for model inference.
   --image IMAGE         Path to an input image file.
   --video VIDEO         Path to an input video file.

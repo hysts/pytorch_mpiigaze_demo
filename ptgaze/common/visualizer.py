@@ -6,15 +6,14 @@ from scipy.spatial.transform import Rotation
 
 from .camera import Camera
 from .face import Face
-from .face_model import MODEL3D
 
 AXIS_COLORS = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 
 
 class Visualizer:
-    def __init__(self, camera: Camera):
+    def __init__(self, camera: Camera, center_point_index: int):
         self._camera = camera
-
+        self._center_point_index = center_point_index
         self.image: Optional[np.ndarray] = None
 
     def set_image(self, image: np.ndarray) -> None:
@@ -78,7 +77,7 @@ class Visualizer:
         axes2d = self._camera.project_points(axes3d,
                                              face.head_pose_rot.as_rotvec(),
                                              face.head_position)
-        center = face.landmarks[MODEL3D.NOSE_INDEX]
+        center = face.landmarks[self._center_point_index]
         center = self._convert_pt(center)
         for pt, color in zip(axes2d, AXIS_COLORS):
             pt = self._convert_pt(pt)

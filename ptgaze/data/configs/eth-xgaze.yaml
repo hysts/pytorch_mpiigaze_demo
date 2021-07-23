@@ -3,17 +3,19 @@ device: cpu
 model:
   name: resnet18
 face_detector:
-  mode: dlib
+  mode: mediapipe
   dlib_model_path: ~/.ptgaze/dlib/shape_predictor_68_face_landmarks.dat
+  mediapipe_max_num_faces: 3
 gaze_estimator:
   checkpoint: ~/.ptgaze/models/eth-xgaze_resnet18.pth
-  camera_params: ptgaze/data/calib/sample_params.yaml
-  normalized_camera_params: ptgaze/data/normalized_camera_params/eth-xgaze.yaml
-  normalized_camera_distance: 0.3
+  camera_params: ${PACKAGE_ROOT}/data/calib/sample_params.yaml
+  use_dummy_camera_params: false
+  normalized_camera_params: ${PACKAGE_ROOT}/data/normalized_camera_params/eth-xgaze.yaml
+  normalized_camera_distance: 0.6
   image_size: [224, 224]
 demo:
-  use_camera: True
-  display_on_screen: True
+  use_camera: true
+  display_on_screen: true
   wait_time: 1
   image_path: null
   video_path: null
@@ -21,8 +23,8 @@ demo:
   output_file_extension: avi
   head_pose_axis_length: 0.05
   gaze_visualization_length: 0.05
-  show_bbox: True
-  show_head_pose: False
-  show_landmarks: False
-  show_normalized_image: False
-  show_template_model: False
+  show_bbox: true
+  show_head_pose: false
+  show_landmarks: false
+  show_normalized_image: false
+  show_template_model: false

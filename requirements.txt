@@ -1,9 +1,10 @@
 dlib
 face_alignment
+mediapipe
 numpy
 omegaconf
-opencv-python<4.2.0
+opencv-python
 pyyaml
 scipy
-torch>=1.4.0
-torchvision>=0.5.0
+torch
+torchvision
