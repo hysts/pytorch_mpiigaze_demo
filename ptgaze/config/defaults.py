@@ -9,7 +9,6 @@ config.device = 'cuda'
 # transform
 config.transform = CfgNode()
 config.transform.mpiifacegaze_face_size = 224
-config.transform.mpiifacegaze_gray = False
 
 config.model = CfgNode()
 config.model.name = 'resnet_preact'

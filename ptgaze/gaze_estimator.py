@@ -65,7 +65,7 @@ class GazeEstimator:
             image = eye.normalized_image
             normalized_head_pose = eye.normalized_head_rot2d
             if key == FacePartsName.REYE:
-                image = image[:, ::-1]
+                image = image[:, ::-1].copy()
                 normalized_head_pose *= np.array([1, -1])
             image = self._transform(image)
             images.append(image)
