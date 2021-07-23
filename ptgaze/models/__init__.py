@@ -6,12 +6,12 @@ import yacs.config
 
 
 def create_model(config: yacs.config.CfgNode) -> torch.nn.Module:
-    dataset_name = config.mode.lower()
-    if dataset_name in ['mpiigaze', 'mpiifacegaze']:
+    mode = config.mode
+    if mode in ['MPIIGaze', 'MPIIFaceGaze']:
         module = importlib.import_module(
-            f'ptgaze.models.{dataset_name}.{config.model.name}')
+            f'ptgaze.models.{mode.lower()}.{config.model.name}')
         model = module.Model(config)
-    elif dataset_name == 'ethxgaze':
+    elif mode == 'ETH-XGaze':
         model = timm.create_model(config.model.name, num_classes=2)
     else:
         raise ValueError

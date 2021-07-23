@@ -9,7 +9,6 @@ import yacs.config
 
 from .common import Face, FacePartsName, Visualizer
 from .gaze_estimator import GazeEstimator
-from .types import GazeEstimationMethod
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -203,14 +202,11 @@ class Demo:
             return
         if not self.show_normalized_image:
             return
-        if self.config.mode == GazeEstimationMethod.MPIIGaze.name:
+        if self.config.mode == 'MPIIGaze':
             reye = face.reye.normalized_image
             leye = face.leye.normalized_image
             normalized = np.hstack([reye, leye])
-        elif self.config.mode in [
-                GazeEstimationMethod.MPIIFaceGaze.name,
-                GazeEstimationMethod.ETHXGaze.name
-        ]:
+        elif self.config.mode in ['MPIIFaceGaze', 'ETH-XGaze']:
             normalized = face.normalized_image
         else:
             raise ValueError
@@ -220,7 +216,7 @@ class Demo:
 
     def _draw_gaze_vector(self, face: Face) -> None:
         length = self.config.demo.gaze_visualization_length
-        if self.config.mode == GazeEstimationMethod.MPIIGaze.name:
+        if self.config.mode == 'MPIIGaze':
             for key in [FacePartsName.REYE, FacePartsName.LEYE]:
                 eye = getattr(face, key.name.lower())
                 self.visualizer.draw_3d_line(
@@ -228,10 +224,7 @@ class Demo:
                 pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
                 logger.info(
                     f'[{key.name.lower()}] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
-        elif self.config.mode in [
-                GazeEstimationMethod.MPIIFaceGaze.name,
-                GazeEstimationMethod.ETHXGaze.name
-        ]:
+        elif self.config.mode in ['MPIIFaceGaze', 'ETH-XGaze']:
             self.visualizer.draw_3d_line(
                 face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))

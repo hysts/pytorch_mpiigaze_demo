@@ -1,4 +1,4 @@
-mode: ETHXGaze
+mode: ETH-XGaze
 device: cpu
 model:
   name: resnet18

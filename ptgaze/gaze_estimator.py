@@ -9,7 +9,6 @@ from .common import MODEL3D, Camera, Face, FacePartsName
 from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
 from .models import create_model
 from .transforms import create_transform
-from .types import GazeEstimationMethod
 
 logger = logging.getLogger(__name__)
 
@@ -48,15 +47,15 @@ class GazeEstimator:
         MODEL3D.compute_3d_pose(face)
         MODEL3D.compute_face_eye_centers(face)
 
-        if self._config.mode == GazeEstimationMethod.MPIIGaze.name:
+        if self._config.mode == 'MPIIGaze':
             for key in self.EYE_KEYS:
                 eye = getattr(face, key.name.lower())
                 self._head_pose_normalizer.normalize(image, eye)
             self._run_mpiigaze_model(face)
-        elif self._config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
+        elif self._config.mode == 'MPIIFaceGaze':
             self._head_pose_normalizer.normalize(image, face)
             self._run_mpiifacegaze_model(face)
-        elif self._config.mode == GazeEstimationMethod.ETHXGaze.name:
+        elif self._config.mode == 'ETH-XGaze':
             self._head_pose_normalizer.normalize(image, face)
             self._run_ethxgaze_model(face)
         else:

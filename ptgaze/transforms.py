@@ -4,15 +4,13 @@ import cv2
 import torchvision.transforms as T
 import yacs.config
 
-from .types import GazeEstimationMethod
-
 
 def create_transform(config: yacs.config.CfgNode) -> Any:
-    if config.mode == GazeEstimationMethod.MPIIGaze.name:
+    if config.mode == 'MPIIGaze':
         return T.ToTensor()
-    elif config.mode == GazeEstimationMethod.MPIIFaceGaze.name:
+    elif config.mode == 'MPIIFaceGaze':
         return _create_mpiifacegaze_transform(config)
-    elif config.mode == GazeEstimationMethod.ETHXGaze.name:
+    elif config.mode == 'ETH-XGaze':
         return _create_ethxgaze_transform(config)
     else:
         raise ValueError
