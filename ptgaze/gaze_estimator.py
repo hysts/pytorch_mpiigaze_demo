@@ -57,6 +57,7 @@ class GazeEstimator:
             self._head_pose_normalizer.normalize(image, face)
             self._run_mpiifacegaze_model(face)
 
+    @torch.no_grad()
     def _run_mpiigaze_model(self, face: Face) -> None:
         images = []
         head_poses = []
@@ -75,11 +76,10 @@ class GazeEstimator:
         head_poses = torch.from_numpy(head_poses)
 
         device = torch.device(self._config.device)
-        with torch.no_grad():
-            images = images.to(device)
-            head_poses = head_poses.to(device)
-            predictions = self._gaze_estimation_model(images, head_poses)
-            predictions = predictions.cpu().numpy()
+        images = images.to(device)
+        head_poses = head_poses.to(device)
+        predictions = self._gaze_estimation_model(images, head_poses)
+        predictions = predictions.cpu().numpy()
 
         for i, key in enumerate(self.EYE_KEYS):
             eye = getattr(face, key.name.lower())
@@ -89,14 +89,14 @@ class GazeEstimator:
             eye.angle_to_vector()
             eye.denormalize_gaze_vector()
 
+    @torch.no_grad()
     def _run_mpiifacegaze_model(self, face: Face) -> None:
         image = self._transform(face.normalized_image).unsqueeze(0)
 
         device = torch.device(self._config.device)
-        with torch.no_grad():
-            image = image.to(device)
-            prediction = self._gaze_estimation_model(image)
-            prediction = prediction.cpu().numpy()
+        image = image.to(device)
+        prediction = self._gaze_estimation_model(image)
+        prediction = prediction.cpu().numpy()
 
         face.normalized_gaze_angles = prediction[0]
         face.angle_to_vector()
