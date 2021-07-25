@@ -87,7 +87,7 @@ def download_ethxgaze_model() -> pathlib.Path:
     if not output_path.exists():
         logger.debug('Download the pretrained model')
         torch.hub.download_url_to_file(
-            'https://github.com/hysts/pytorch_mpiigaze_demo/releases/download/v0.2.0/eth-xgaze_resnet18.pth',
+            'https://github.com/hysts/pytorch_mpiigaze_demo/releases/download/v0.2.2/eth-xgaze_resnet18.pth',
             output_path.as_posix())
     else:
         logger.debug(f'The pretrained model {output_path} already exists.')
