@@ -18,7 +18,7 @@ def _get_requirements(path):
 
 setup(
     name='ptgaze',
-    version='0.2.0',
+    version='0.2.1',
     author='hysts',
     url='https://github.com/hysts/pytorch_mpiigaze_demo',
     python_requires='>=3.7',

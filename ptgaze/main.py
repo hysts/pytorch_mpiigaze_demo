@@ -135,7 +135,7 @@ def main():
     expanduser_all(config)
     if config.gaze_estimator.use_dummy_camera_params:
         generate_dummy_camera_params(config)
-    check_path_all(config)
+
     OmegaConf.set_readonly(config, True)
     logger.info(OmegaConf.to_yaml(config))
 
@@ -148,6 +148,8 @@ def main():
             download_mpiifacegaze_model()
         elif config.mode == 'ETH-XGaze':
             download_ethxgaze_model()
+
+    check_path_all(config)
 
     demo = Demo(config)
     demo.run()
