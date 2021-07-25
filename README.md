@@ -1,5 +1,7 @@
 # A demo program of gaze estimation models (MPIIGaze, MPIIFaceGaze, ETH-XGaze)
 
+[![PyPI version](https://badge.fury.io/py/ptgaze.svg)](https://pypi.org/project/ptgaze/)
+
 With this program, you can run gaze estimation on images and videos.
 By default, the video from a webcam will be used.
 
