@@ -106,7 +106,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
         config.demo.use_camera = False
     if args.camera:
         config.gaze_estimator.camera_params = args.camera
-    else:
+    elif args.image or args.video:
         config.gaze_estimator.use_dummy_camera_params = True
     if args.output_dir:
         config.demo.output_dir = args.output_dir
