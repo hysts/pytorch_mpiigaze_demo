@@ -51,7 +51,7 @@ optional arguments:
   --mode {mpiigaze,mpiifacegaze,eth-xgaze}
                         With 'mpiigaze', MPIIGaze model will be used. With 'mpiifacegaze',
                         MPIIFaceGaze model will be used. With 'eth-xgaze', ETH-XGaze model will be
-                        used. (default: 'eth-xgaze')
+                        used.
   --face-detector {dlib,face_alignment_dlib,face_alignment_sfd,mediapipe}
                         The method used to detect faces and find face landmarks (default:
                         'mediapipe')
