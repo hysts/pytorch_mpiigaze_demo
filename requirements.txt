@@ -6,5 +6,6 @@ omegaconf
 opencv-python
 pyyaml
 scipy
+timm
 torch
 torchvision
