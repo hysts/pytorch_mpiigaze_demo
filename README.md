@@ -2,6 +2,8 @@
 
 [![PyPI version](https://badge.fury.io/py/ptgaze.svg)](https://pypi.org/project/ptgaze/)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hysts/pytorch_mpiigaze_demo/blob/master/demo.ipynb)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/hysts/pytorch_mpiigaze_demo.svg?style=flat-square&logo=github&label=Stars&logoColor=white)](https://github.com/hysts/pytorch_mpiigaze_demo)
 
 With this program, you can run gaze estimation on images and videos.
 By default, the video from a webcam will be used.
@@ -17,6 +19,8 @@ By default, the video from a webcam will be used.
 
 To train a model for MPIIGaze and MPIIFaceGaze,
 use [this repository](https://github.com/hysts/pytorch_mpiigaze).
+You can also use [this repo](https://github.com/hysts/pl_gaze_estimation)
+to train a model with ETH-XGaze dataset.
 
 ## Quick start
 
