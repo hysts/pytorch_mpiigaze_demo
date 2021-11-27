@@ -9,14 +9,14 @@
 With this program, you can run gaze estimation on images and videos.
 By default, the video from a webcam will be used.
 
-![ETH-XGaze video01 result](assets/results/eth-xgaze_video01.gif)
-![ETH-XGaze video02 result](assets/results/eth-xgaze_video02.gif)
-![ETH-XGaze video03 result](assets/results/eth-xgaze_video03.gif)
+![ETH-XGaze video01 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/eth-xgaze_video01.gif)
+![ETH-XGaze video02 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/eth-xgaze_video02.gif)
+![ETH-XGaze video03 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/eth-xgaze_video03.gif)
 
-![MPIIGaze video00 result](assets/results/mpiigaze_video00.gif)
-![MPIIFaceGaze video00 result](assets/results/mpiifacegaze_video00.gif)
+![MPIIGaze video00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/mpiigaze_video00.gif)
+![MPIIFaceGaze video00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/mpiifacegaze_video00.gif)
 
-![MPIIGaze image00 result](assets/results/mpiigaze_image00.jpg)
+![MPIIGaze image00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/mpiigaze_image00.jpg)
 
 To train a model for MPIIGaze and MPIIFaceGaze,
 use [this repository](https://github.com/hysts/pytorch_mpiigaze).
