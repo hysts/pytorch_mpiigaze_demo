@@ -6,6 +6,7 @@ face_detector:
   mode: dlib
   dlib_model_path: ~/.ptgaze/dlib/shape_predictor_68_face_landmarks.dat
   mediapipe_max_num_faces: 3
+  mediapipe_static_image_mode: false
 gaze_estimator:
   checkpoint: ~/.ptgaze/models/mpiigaze_resnet_preact.pth
   camera_params: ${PACKAGE_ROOT}/data/calib/sample_params.yaml

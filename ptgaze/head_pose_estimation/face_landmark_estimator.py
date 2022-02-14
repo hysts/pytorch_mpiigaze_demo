@@ -33,7 +33,9 @@ class LandmarkEstimator:
                 device=config.device)
         elif self.mode == 'mediapipe':
             self.detector = mediapipe.solutions.face_mesh.FaceMesh(
-                max_num_faces=config.face_detector.mediapipe_max_num_faces)
+                max_num_faces=config.face_detector.mediapipe_max_num_faces,
+                static_image_mode=config.face_detector.
+                mediapipe_static_image_mode)
         else:
             raise ValueError
 
