@@ -2,6 +2,7 @@ import bz2
 import logging
 import operator
 import pathlib
+import tempfile
 
 import cv2
 import torch.hub
@@ -113,7 +114,8 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         raise ValueError
     logger.debug(f'Frame size is ({w}, {h})')
     logger.debug(f'Close video {config.demo.video_path}')
-    logger.debug(f'Create a dummy camera param file /tmp/camera_params.yaml')
+    out_file = tempfile.NamedTemporaryFile(suffix='.yaml', delete=False)
+    logger.debug(f'Create a dummy camera param file {out_file.name}')
     dic = {
         'image_width': w,
         'image_height': h,
@@ -128,12 +130,11 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
             'data': [0., 0., 0., 0., 0.]
         }
     }
-    with open('/tmp/camera_params.yaml', 'w') as f:
+    with open(out_file.name, 'w') as f:
         yaml.safe_dump(dic, f)
-    config.gaze_estimator.camera_params = '/tmp/camera_params.yaml'
+    config.gaze_estimator.camera_params = out_file.name
     logger.debug(
-        'Update config.gaze_estimator.camera_params to /tmp/camera_params.yaml'
-    )
+        f'Update config.gaze_estimator.camera_params to {out_file.name}')
 
 
 def _expanduser(path: str) -> str:
