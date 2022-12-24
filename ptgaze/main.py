@@ -6,8 +6,8 @@ import warnings
 import torch
 from omegaconf import DictConfig, OmegaConf
 
-from .demo import Demo
-from .utils import (check_path_all, download_dlib_pretrained_model,
+from demo import Demo
+from utils import (check_path_all, download_dlib_pretrained_model,
                     download_ethxgaze_model, download_mpiifacegaze_model,
                     download_mpiigaze_model, expanduser_all,
                     generate_dummy_camera_params)
@@ -73,6 +73,7 @@ def parse_args() -> argparse.Namespace:
         help='If specified, the video is not displayed on screen, and saved '
         'to the output directory.')
     parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--log', action='store_true', default=False)
     return parser.parse_args()
 
 
@@ -116,7 +117,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
         config.demo.display_on_screen = False
         if not config.demo.output_dir:
             config.demo.output_dir = 'outputs'
-
+    config.log = True if args.log else False
     return config
 
 
@@ -150,6 +151,5 @@ def main():
             download_ethxgaze_model()
 
     check_path_all(config)
-
     demo = Demo(config)
     demo.run()

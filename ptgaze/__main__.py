@@ -1,3 +1,3 @@
-import ptgaze.main
+import main
 
-ptgaze.main.main()
+main.main()

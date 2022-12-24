@@ -5,11 +5,11 @@ import numpy as np
 import torch
 from omegaconf import DictConfig
 
-from .common import Camera, Face, FacePartsName
-from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
-from .models import create_model
-from .transforms import create_transform
-from .utils import get_3d_face_model
+from common import Camera, Face, FacePartsName
+from head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
+from models import create_model
+from transforms import create_transform
+from utils import get_3d_face_model
 
 logger = logging.getLogger(__name__)
 

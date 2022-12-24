@@ -1,4 +1,6 @@
 from typing import List
+import sys
+sys.path.insert(0, '../common')
 
 import dlib
 import face_alignment
@@ -7,7 +9,7 @@ import mediapipe
 import numpy as np
 from omegaconf import DictConfig
 
-from ..common import Face
+from common import Face # type: ignore
 
 
 class LandmarkEstimator:
