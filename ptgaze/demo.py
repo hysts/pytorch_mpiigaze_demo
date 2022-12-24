@@ -222,17 +222,19 @@ class Demo:
         if self.config.mode == 'MPIIGaze':
             for key in [FacePartsName.REYE, FacePartsName.LEYE]:
                 eye = getattr(face, key.name.lower())
-                self.visualizer.draw_3d_line(
+                pt0, pt1 = self.visualizer.draw_3d_line(
                     eye.center, eye.center + length * eye.gaze_vector)
                 pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
                 if self.config.log:
                     logger.info(
                         f'[{key.name.lower()}] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
         elif self.config.mode in ['MPIIFaceGaze', 'ETH-XGaze']:
-            self.visualizer.draw_3d_line(
+            pt0, pt1 = self.visualizer.draw_3d_line(
                 face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))
             if self.config.log:
                 logger.info(f'[face] pitch: {pitch:.2f}, yaw: {yaw:.2f}')
         else:
             raise ValueError
+        
+        return pt0, pt1
