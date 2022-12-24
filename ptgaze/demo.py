@@ -238,3 +238,20 @@ class Demo:
             raise ValueError
         
         return pt0, pt1
+
+    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=1):
+        '''
+        gaze_array is a list of 2d points where gaze was being made. 
+        Using that information, predict whether gaze is being made when
+        gaze points are pt0 and pt1
+        '''
+        # get equation of line pt0, pt1
+        for point in self.config.intersections:
+            window_lower_x = point[0] - point[0]*error_factor
+            window_upper_x = point[0] + point[0]*error_factor
+            window_lower_y = point[1] - point[1]*error_factor
+            window_upper_y = point[1] + point[1]*error_factor
+            # check if point (with some error margin) lies on line pt0, pt1
+            # if it does then return True
+        
+        return False

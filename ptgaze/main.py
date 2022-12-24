@@ -2,6 +2,7 @@ import argparse
 import logging
 import pathlib
 import warnings
+import itertools
 
 import torch
 from omegaconf import DictConfig, OmegaConf
@@ -10,7 +11,7 @@ from demo import Demo
 from utils import (check_path_all, download_dlib_pretrained_model,
                     download_ethxgaze_model, download_mpiifacegaze_model,
                     download_mpiigaze_model, expanduser_all,
-                    generate_dummy_camera_params)
+                    generate_dummy_camera_params, Point, lineLineIntersection)
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +75,7 @@ def parse_args() -> argparse.Namespace:
         'to the output directory.')
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--log', action='store_true', default=False)
+    parser.add_argument('--gaze_array', nargs='+', default=False)
     return parser.parse_args()
 
 
@@ -118,6 +120,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
         if not config.demo.output_dir:
             config.demo.output_dir = 'outputs'
     config.log = True if args.log else False
+    config.gaze_array = args.gaze_array if args.gaze_array else False
     return config
 
 
@@ -151,5 +154,18 @@ def main():
             download_ethxgaze_model()
 
     check_path_all(config)
+    config.intersections = _compute_intersections(config.gaze_array)
     demo = Demo(config)
     demo.run()
+
+def _compute_intersections(points):
+    cords = [(int(points[i]), int(points[i+1])) for i in range(0, len(points) - 1, 2)]
+    lines = [(cords[i], cords[i+1]) for i in range(0, len(cords)-1, 2)]
+    combs_of_lines = list(itertools.combinations(lines, 2))
+    intersections = []
+    for i in combs_of_lines:
+        intersec = lineLineIntersection(Point(i[0][0][0], i[0][0][1]), Point(i[0][1][0], i[0][1][1]), Point(i[1][0][0], i[1][0][1]), Point(i[1][1][0], i[1][1][1]))
+        intersections.append((intersec.x, intersec.y))
+    return intersections
+
+ 

@@ -15,6 +15,35 @@ from common.face_model_mediapipe import FaceModelMediaPipe
 
 logger = logging.getLogger(__name__)
 
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+ 
+    def displayPoint(self, p):
+        print(f"({p.x}, {p.y})")
+
+def lineLineIntersection(A, B, C, D):
+    # Line AB represented as a1x + b1y = c1
+    a1 = B.y - A.y
+    b1 = A.x - B.x
+    c1 = a1*(A.x) + b1*(A.y)
+ 
+    # Line CD represented as a2x + b2y = c2
+    a2 = D.y - C.y
+    b2 = C.x - D.x
+    c2 = a2*(C.x) + b2*(C.y)
+ 
+    determinant = a1*b2 - a2*b1
+ 
+    if (determinant == 0):
+        # The lines are parallel. This is simplified
+        # by returning a pair of FLT_MAX
+        return Point(10**9, 10**9)
+    else:
+        x = (b2*c1 - b1*c2)/determinant
+        y = (a1*c2 - a2*c1)/determinant
+        return Point(x, y)
 
 def get_3d_face_model(config: DictConfig) -> FaceModel:
     if config.face_detector.mode == 'mediapipe':
