@@ -121,6 +121,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
             config.demo.output_dir = 'outputs'
     config.log = True if args.log else False
     config.gaze_array = args.gaze_array if args.gaze_array else False
+    config.intersections = _compute_intersections(config.gaze_array)
     return config
 
 
@@ -154,7 +155,6 @@ def main():
             download_ethxgaze_model()
 
     check_path_all(config)
-    config.intersections = _compute_intersections(config.gaze_array)
     demo = Demo(config)
     demo.run()
 

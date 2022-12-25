@@ -254,8 +254,12 @@ class Demo:
         gaze points are pt0 and pt1
         '''
         # get equation of line pt0, pt1
-        slope = (pt0[1] - pt1[1]) / (pt0[0] - pt1[0])
-        y_intercept = (((pt1[1] - pt0[1]) / (pt1[0] - pt0[0])) * (- pt0[0])) + pt0[1]
+        if pt0[0] == pt1[0]:
+            slope = np.inf
+            y_intercept = np.inf
+        else:
+            slope = (pt0[1] - pt1[1]) / (pt0[0] - pt1[0])
+            y_intercept = (((pt1[1] - pt0[1]) / (pt1[0] - pt0[0])) * (- pt0[0])) + pt0[1]
         for point in self.config.intersections:
             window_lower_x = point[0] - sigmoid(point[0])*error_factor
             window_upper_x = point[0] + sigmoid(point[0])*error_factor
