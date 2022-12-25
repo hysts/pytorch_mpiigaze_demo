@@ -84,3 +84,6 @@ class Visualizer:
         for pt, color in zip(axes2d, AXIS_COLORS):
             pt = self._convert_pt(pt)
             cv2.line(self.image, center, pt, color, lw, cv2.LINE_AA)
+    
+    def write_prediction(self, prediction):
+        cv2.putText(self.image, f"Gaze: {prediction}", (80, 80), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, 255)

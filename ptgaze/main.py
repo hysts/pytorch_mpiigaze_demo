@@ -159,13 +159,15 @@ def main():
     demo.run()
 
 def _compute_intersections(points):
-    cords = [(int(points[i]), int(points[i+1])) for i in range(0, len(points) - 1, 2)]
-    lines = [(cords[i], cords[i+1]) for i in range(0, len(cords)-1, 2)]
-    combs_of_lines = list(itertools.combinations(lines, 2))
-    intersections = []
-    for i in combs_of_lines:
-        intersec = lineLineIntersection(Point(i[0][0][0], i[0][0][1]), Point(i[0][1][0], i[0][1][1]), Point(i[1][0][0], i[1][0][1]), Point(i[1][1][0], i[1][1][1]))
-        intersections.append((intersec.x, intersec.y))
-    return intersections
+    if points:
+        cords = [(int(points[i]), int(points[i+1])) for i in range(0, len(points) - 1, 2)]
+        lines = [(cords[i], cords[i+1]) for i in range(0, len(cords)-1, 2)]
+        combs_of_lines = list(itertools.combinations(lines, 2))
+        intersections = []
+        for i in combs_of_lines:
+            intersec = lineLineIntersection(Point(i[0][0][0], i[0][0][1]), Point(i[0][1][0], i[0][1][1]), Point(i[1][0][0], i[1][0][1]), Point(i[1][1][0], i[1][1][1]))
+            intersections.append((intersec.x, intersec.y))
+        return intersections
+    return False
 
  

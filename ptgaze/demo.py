@@ -2,6 +2,7 @@ import datetime
 import logging
 import pathlib
 from typing import Optional
+import math
 
 import cv2
 import numpy as np
@@ -13,6 +14,10 @@ from utils import get_3d_face_model
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def sigmoid(x):
+  return 1 / (1 + math.exp(-x))
 
 
 class Demo:
@@ -237,21 +242,29 @@ class Demo:
         else:
             raise ValueError
         
+        if self.config.gaze_array:
+            pred = self._predict_gaze_ground_truth(pt0, pt1)
+            self.visualizer.write_prediction(pred)
         return pt0, pt1
 
-    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=1):
+    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=5):
         '''
         gaze_array is a list of 2d points where gaze was being made. 
         Using that information, predict whether gaze is being made when
         gaze points are pt0 and pt1
         '''
         # get equation of line pt0, pt1
+        slope = (pt0[1] - pt1[1]) / (pt0[0] - pt1[0])
+        y_intercept = (((pt1[1] - pt0[1]) / (pt1[0] - pt0[0])) * (- pt0[0])) + pt0[1]
         for point in self.config.intersections:
-            window_lower_x = point[0] - point[0]*error_factor
-            window_upper_x = point[0] + point[0]*error_factor
-            window_lower_y = point[1] - point[1]*error_factor
-            window_upper_y = point[1] + point[1]*error_factor
+            window_lower_x = point[0] - sigmoid(point[0])*error_factor
+            window_upper_x = point[0] + sigmoid(point[0])*error_factor
+            window_lower_y = point[1] - sigmoid(point[1])*error_factor
+            window_upper_y = point[1] + sigmoid(point[1])*error_factor
             # check if point (with some error margin) lies on line pt0, pt1
             # if it does then return True
-        
+            y = (slope * point[0]) + y_intercept
+            x = (point[1] - y_intercept) / slope
+            if window_lower_x < x < window_upper_x and window_lower_y < y < window_upper_y:
+                return True
         return False
