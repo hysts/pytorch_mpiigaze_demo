@@ -113,5 +113,10 @@ To convert the video into .mp4
 ffmpeg -i assets/results/gazeEstimation1.avi assets/results/gazeestimation1.mp4
 ```
 
+Another example:
+```
+python3 ptgaze/__main__.py --mode eth-xgaze --video assets/inputs/gazeEstimation2.mov -o assets/results --gaze_array 338 419 360 465 542 414 535 462 799 500 773 554 860 517 824 565 583 259 582 300 561 346 562 398 565 442 569 500 643 455 641 527
+```
+
 
 Following this format, the consecutive pairs of integers from the gaze_array parameter form points in 2d (eg 6 integers = 3 points) and consecutive pairs of points form lines (6 points = 3 lines). We then compute the intersections of all combinations of lines (line 1 and 2, 2 and 3, 1 and 3) and then check, for every frame in th video, whether any of the intersection points lie on the gaze line from that frame (with some margin for error). 
