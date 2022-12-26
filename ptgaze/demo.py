@@ -247,7 +247,7 @@ class Demo:
             self.visualizer.write_prediction(pred)
         return pt0, pt1
 
-    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=5):
+    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=20):
         '''
         gaze_array is a list of 2d points where gaze was being made. 
         Using that information, predict whether gaze is being made when

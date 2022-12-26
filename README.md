@@ -93,3 +93,25 @@ to show or hide intermediate results:
 - Zhang, Xucong, Yusuke Sugano, Mario Fritz, and Andreas Bulling. "It's Written All Over Your Face: Full-Face Appearance-Based Gaze Estimation." Proc. of the IEEE Conference on Computer Vision and Pattern Recognition Workshops(CVPRW), 2017. [arXiv:1611.08860](https://arxiv.org/abs/1611.08860), [Project Page](https://www.mpi-inf.mpg.de/departments/computer-vision-and-machine-learning/research/gaze-based-human-computer-interaction/its-written-all-over-your-face-full-face-appearance-based-gaze-estimation/)
 - Zhang, Xucong, Yusuke Sugano, Mario Fritz, and Andreas Bulling. "MPIIGaze: Real-World Dataset and Deep Appearance-Based Gaze Estimation." IEEE transactions on pattern analysis and machine intelligence 41 (2017). [arXiv:1711.09017](https://arxiv.org/abs/1711.09017)
 - Zhang, Xucong, Yusuke Sugano, and Andreas Bulling. "Evaluation of Appearance-Based Methods and Implications for Gaze-Based Applications." Proc. ACM SIGCHI Conference on Human Factors in Computing Systems (CHI), 2019. [arXiv](https://arxiv.org/abs/1901.10906), [code](https://git.hcics.simtech.uni-stuttgart.de/public-projects/opengaze)
+
+
+## Gaze Prediction
+
+When estimating gaze, the model predicts a gaze array and that data is used to draw the gaze line seen in the video.
+To predict gaze:
+- Atleast 2 instances where gaze = True must be given to the algorithm. 
+- We the compute the intersections of all combinations of gaze lines (where the ground truth -> gaze = True).
+- For every frame of the video, we check if any of the above computed intersections lie on the current gaze line (with some margin for error). If any of them do, then return True, else False.
+
+### Example
+We run the algorithm on the gazeEstimation1.mov video found in the assets/inputs folder. In the following command used to run gaze prediction, notice the gaze_array parameter. It consists of 12 integers. In general, the parameter will always consist of 4x integers where x > 1. The set of 4 integers are got from a frame of the video where gaze is being made, and the 4 numbers are the x and y coordinates of pt0 and pt1. To get an overlay of the points on the video, the below command can be run without the gaze_array parameter.
+```
+python3 ptgaze/__main__.py --mode eth-xgaze --video assets/inputs/gazeEstimation1.mov -o assets/results --gaze_array 523 445 516 476 746 406 714 411 285 416 321 427
+```
+To convert the video into .mp4 
+```
+ffmpeg -i assets/results/gazeEstimation1.avi assets/results/gazeestimation1.mp4
+```
+
+
+Following this format, the consecutive pairs of integers from the gaze_array parameter form points in 2d (eg 6 integers = 3 points) and consecutive pairs of points form lines (6 points = 3 lines). We then compute the intersections of all combinations of lines (line 1 and 2, 2 and 3, 1 and 3) and then check, for every frame in th video, whether any of the intersection points lie on the gaze line from that frame (with some margin for error). 
