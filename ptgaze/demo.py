@@ -266,7 +266,10 @@ class Demo:
             y = (slope * point[0]) + y_intercept
             if y - error_factor <= point[1] <= y + error_factor:
                 return True
-            x = (point[1] - y_intercept) / slope
+            if slope == 0:
+                x = np.inf
+            else:
+                x = (point[1] - y_intercept) / slope
             if x - error_factor <= point[0] <= x + error_factor:
                 return True
 
