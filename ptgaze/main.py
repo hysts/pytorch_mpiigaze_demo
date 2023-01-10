@@ -6,6 +6,7 @@ import itertools
 
 import torch
 from omegaconf import DictConfig, OmegaConf
+import numpy as np
 
 from demo import Demo
 from utils import (check_path_all, download_dlib_pretrained_model,
@@ -121,7 +122,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
             config.demo.output_dir = 'outputs'
     config.log = True if args.log else False
     config.gaze_array = args.gaze_array if args.gaze_array else False
-    config.intersections = _compute_intersections(config.gaze_array)
+    config.slopes = _calculate_slopes(config.gaze_array)
     return config
 
 
@@ -158,16 +159,19 @@ def main():
     demo = Demo(config)
     demo.run()
 
-def _compute_intersections(points):
+def _calculate_slopes(points):
     if points:
         cords = [(int(points[i]), int(points[i+1])) for i in range(0, len(points) - 1, 2)]
         lines = [(cords[i], cords[i+1]) for i in range(0, len(cords)-1, 2)]
-        combs_of_lines = list(itertools.combinations(lines, 2))
-        intersections = []
-        for i in combs_of_lines:
-            intersec = lineLineIntersection(Point(i[0][0][0], i[0][0][1]), Point(i[0][1][0], i[0][1][1]), Point(i[1][0][0], i[1][0][1]), Point(i[1][1][0], i[1][1][1]))
-            intersections.append((intersec.x, intersec.y))
-        return intersections
+        slopes = []
+        for i in lines:
+            pt0, pt1 = i[0], i[1]
+            if pt0[0] - pt1[0] == 0:
+                slope = np.inf
+            else:
+                slope = (pt0[1] - pt1[1]) / (pt0[0] - pt1[0])
+            slopes.append(slope)
+        return slopes
     return False
 
  

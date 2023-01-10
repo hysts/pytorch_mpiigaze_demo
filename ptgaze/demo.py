@@ -247,7 +247,7 @@ class Demo:
             self.visualizer.write_prediction(pred)
         return pt0, pt1
 
-    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=10):
+    def _predict_gaze_ground_truth(self, pt0, pt1, error_factor=5):
         '''
         gaze_array is a list of 2d points where gaze was being made. 
         Using that information, predict whether gaze is being made when
@@ -256,21 +256,12 @@ class Demo:
         # get equation of line pt0, pt1
         if pt0[0] == pt1[0]:
             slope = np.inf
-            y_intercept = np.inf
         else:
             slope = (pt0[1] - pt1[1]) / (pt0[0] - pt1[0])
-            y_intercept = pt0[1] - (slope * pt0[0])
-        for point in self.config.intersections:
+        for m in self.config.slopes:
             # check if point (with some error margin) lies on line pt0, pt1
             # if it does then return True
-            y = (slope * point[0]) + y_intercept
-            if y - error_factor <= point[1] <= y + error_factor:
-                return True
-            if slope == 0:
-                x = np.inf
-            else:
-                x = (point[1] - y_intercept) / slope
-            if x - error_factor <= point[0] <= x + error_factor:
+            if m - error_factor <= slope <= m + error_factor:
                 return True
 
         return False

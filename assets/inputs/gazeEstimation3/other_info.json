@@ -1,0 +1,5 @@
+{
+    "fps": 30.0, 
+    "video_path": "/Users/ribhavkapur/Desktop/gazeEstimation/assets/inputs/gazeEstimation3.mov", 
+    "audio_path": "/Users/ribhavkapur/Desktop/gazeEstimation/assets/inputs/gazeEstimation3/audio.mp3"
+}
