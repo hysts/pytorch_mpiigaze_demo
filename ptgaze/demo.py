@@ -41,6 +41,8 @@ class Demo:
         self.show_normalized_image = self.config.demo.show_normalized_image
         self.show_template_model = self.config.demo.show_template_model
 
+        self.predictions = []
+
     def run(self) -> None:
         if self.config.demo.use_camera or self.config.demo.video_path:
             self._run_on_video()
@@ -48,6 +50,9 @@ class Demo:
             self._run_on_image()
         else:
             raise ValueError
+        with open(f'{self.config.demo.video_path[:-4]}.txt', 'w') as f:
+            for i in self.predictions:  
+                f.write(str(i) + '\n')
 
     def _run_on_image(self):
         image = cv2.imread(self.config.demo.image_path)
@@ -262,6 +267,7 @@ class Demo:
             # check if point (with some error margin) lies on line pt0, pt1
             # if it does then return True
             if m - error_factor <= slope <= m + error_factor:
+                self.predictions.append(True)
                 return True
-
+        self.predictions.append(False)
         return False
