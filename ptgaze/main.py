@@ -127,6 +127,8 @@ def main():
 
     if args.config:
         config = OmegaConf.load(args.config)
+        package_root = pathlib.Path(__file__).parent.resolve()
+        config.PACKAGE_ROOT = package_root.as_posix()
     elif args.mode:
         config = load_mode_config(args)
     else:
