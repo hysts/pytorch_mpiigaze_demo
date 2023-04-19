@@ -20,7 +20,6 @@ demo:
   image_path: null
   video_path: null
   output_dir: null
-  output_file_extension: avi
   head_pose_axis_length: 0.05
   gaze_visualization_length: 0.05
   show_bbox: true
