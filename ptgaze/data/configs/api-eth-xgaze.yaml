@@ -15,8 +15,8 @@ gaze_estimator:
   image_size: [224, 224]
 demo:
   use_camera: false
-  display_on_screen: false
-  wait_time: 0
+  display_on_screen: true
+  wait_time: 10
   image_path: null
   video_path: null
   output_dir: null

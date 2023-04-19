@@ -24,11 +24,7 @@ class APIGaze:
         face_model_3d = get_3d_face_model(config)
         self.visualizer = Visualizer(self.gaze_estimator.camera,
                                      face_model_3d.NOSE_INDEX)
-
-        self.cap = self._create_capture()
-        self.output_dir = self._create_output_dir()
-        self.writer = self._create_video_writer()
-
+        
         self.stop = False
         self.show_bbox = self.config.demo.show_bbox
         self.show_head_pose = self.config.demo.show_head_pose
@@ -36,16 +32,10 @@ class APIGaze:
         self.show_normalized_image = self.config.demo.show_normalized_image
         self.show_template_model = self.config.demo.show_template_model
 
-    def run(self) -> None:
-        if self.config.demo.use_camera or self.config.demo.video_path:
-            self._run_on_video()
-        elif self.config.demo.image_path:
-            self._run_on_image()
-        else:
-            raise ValueError
+    def run(self, image) -> None:
+            self._run_on_image(image)
 
-    def _run_on_image(self):
-        image = cv2.imread(self.config.demo.image_path)
+    def _run_on_image(self, image):
         self._process_image(image)
         if self.config.demo.display_on_screen:
             while True:
@@ -55,28 +45,6 @@ class APIGaze:
                 if key_pressed:
                     self._process_image(image)
                 cv2.imshow('image', self.visualizer.image)
-        if self.config.demo.output_dir:
-            name = pathlib.Path(self.config.demo.image_path).name
-            output_path = pathlib.Path(self.config.demo.output_dir) / name
-            cv2.imwrite(output_path.as_posix(), self.visualizer.image)
-
-    def _run_on_video(self) -> None:
-        while True:
-            if self.config.demo.display_on_screen:
-                self._wait_key()
-                if self.stop:
-                    break
-
-            ok, frame = self.cap.read()
-            if not ok:
-                break
-            self._process_image(frame)
-
-            if self.config.demo.display_on_screen:
-                cv2.imshow('frame', self.visualizer.image)
-        self.cap.release()
-        if self.writer:
-            self.writer.release()
 
     def _process_image(self, image) -> None:
         undistorted = cv2.undistort(
@@ -93,63 +61,6 @@ class APIGaze:
             self._draw_face_template_model(face)
             self._draw_gaze_vector(face)
             self._display_normalized_image(face)
-
-        if self.config.demo.use_camera:
-            self.visualizer.image = self.visualizer.image[:, ::-1]
-        if self.writer:
-            self.writer.write(self.visualizer.image)
-
-    def _create_capture(self) -> Optional[cv2.VideoCapture]:
-        if self.config.demo.image_path:
-            return None
-        if self.config.demo.use_camera:
-            cap = cv2.VideoCapture(0)
-        elif self.config.demo.video_path:
-            cap = cv2.VideoCapture(self.config.demo.video_path)
-        else:
-            raise ValueError
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.gaze_estimator.camera.width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.gaze_estimator.camera.height)
-        return cap
-
-    def _create_output_dir(self) -> Optional[pathlib.Path]:
-        if not self.config.demo.output_dir:
-            return
-        output_dir = pathlib.Path(self.config.demo.output_dir)
-        output_dir.mkdir(exist_ok=True, parents=True)
-        return output_dir
-
-    @staticmethod
-    def _create_timestamp() -> str:
-        dt = datetime.datetime.now()
-        return dt.strftime('%Y%m%d_%H%M%S')
-
-    def _create_video_writer(self) -> Optional[cv2.VideoWriter]:
-        if self.config.demo.image_path:
-            return None
-        if not self.output_dir:
-            return None
-        ext = self.config.demo.output_file_extension
-        if ext == 'mp4':
-            fourcc = cv2.VideoWriter_fourcc(*'H264')
-        elif ext == 'avi':
-            fourcc = cv2.VideoWriter_fourcc(*'PIM1')
-        else:
-            raise ValueError
-        if self.config.demo.use_camera:
-            output_name = f'{self._create_timestamp()}.{ext}'
-        elif self.config.demo.video_path:
-            name = pathlib.Path(self.config.demo.video_path).stem
-            output_name = f'{name}.{ext}'
-        else:
-            raise ValueError
-        output_path = self.output_dir / output_name
-        writer = cv2.VideoWriter(output_path.as_posix(), fourcc, 30,
-                                 (self.gaze_estimator.camera.width,
-                                  self.gaze_estimator.camera.height))
-        if writer is None:
-            raise RuntimeError
-        return writer
 
     def _wait_key(self) -> bool:
         key = cv2.waitKey(self.config.demo.wait_time) & 0xff
