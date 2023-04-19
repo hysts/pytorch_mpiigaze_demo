@@ -1,0 +1,30 @@
+mode: ETH-XGaze
+device: cpu
+model:
+  name: resnet18
+face_detector:
+  mode: mediapipe
+  mediapipe_max_num_faces: 3
+  mediapipe_static_image_mode: true
+gaze_estimator:
+  checkpoint: ~/.ptgaze/models/eth-xgaze_resnet18.pth
+  camera_params: ${PACKAGE_ROOT}/data/calib/sample_params.yaml
+  use_dummy_camera_params: false
+  normalized_camera_params: ${PACKAGE_ROOT}/data/normalized_camera_params/eth-xgaze.yaml
+  normalized_camera_distance: 0.6
+  image_size: [224, 224]
+demo:
+  use_camera: false
+  display_on_screen: false
+  wait_time: 0
+  image_path: null
+  video_path: null
+  output_dir: null
+  output_file_extension: avi
+  head_pose_axis_length: 0.05
+  gaze_visualization_length: 0.05
+  show_bbox: true
+  show_head_pose: false
+  show_landmarks: true
+  show_normalized_image: false
+  show_template_model: false
