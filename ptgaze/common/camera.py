@@ -31,9 +31,9 @@ class Camera:
                        tvec: Optional[np.ndarray] = None) -> np.ndarray:
         assert points3d.shape[1] == 3
         if rvec is None:
-            rvec = np.zeros(3, dtype=np.float)
+            rvec = np.zeros(3, dtype=float)
         if tvec is None:
-            tvec = np.zeros(3, dtype=np.float)
+            tvec = np.zeros(3, dtype=float)
         points2d, _ = cv2.projectPoints(points3d, rvec, tvec,
                                         self.camera_matrix,
                                         self.dist_coefficients)

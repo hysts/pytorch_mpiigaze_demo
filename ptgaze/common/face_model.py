@@ -1,5 +1,3 @@
-import dataclasses
-
 import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -8,7 +6,6 @@ from .camera import Camera
 from .face import Face
 
 
-@dataclasses.dataclass(frozen=True)
 class FaceModel:
     LANDMARKS: np.ndarray
     REYE_INDICES: np.ndarray
@@ -26,8 +23,8 @@ class FaceModel:
         # The default values of rvec and tvec below mean that the
         # initial estimate of the head pose is not rotated and the
         # face is in front of the camera.
-        rvec = np.zeros(3, dtype=np.float)
-        tvec = np.array([0, 0, 1], dtype=np.float)
+        rvec = np.zeros(3, dtype=float)
+        tvec = np.array([0, 0, 1], dtype=float)
         _, rvec, tvec = cv2.solvePnP(self.LANDMARKS,
                                      face.landmarks,
                                      camera.camera_matrix,

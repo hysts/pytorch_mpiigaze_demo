@@ -1,11 +1,8 @@
-import dataclasses
-
 import numpy as np
 
 from .face_model import FaceModel
 
 
-@dataclasses.dataclass(frozen=True)
 class FaceModelMediaPipe(FaceModel):
     """3D face model for MediaPipe 468 points mark-up.
 

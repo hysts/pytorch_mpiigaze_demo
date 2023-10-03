@@ -1,11 +1,8 @@
-import dataclasses
-
 import numpy as np
 
 from .face_model import FaceModel
 
 
-@dataclasses.dataclass(frozen=True)
 class FaceModel68(FaceModel):
     """3D face model for Multi-PIE 68 points mark-up.
 

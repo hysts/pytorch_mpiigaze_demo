@@ -25,12 +25,12 @@ class Visualizer:
                   lw: int = 1) -> None:
         assert self.image is not None
         assert bbox.shape == (2, 2)
-        bbox = np.round(bbox).astype(np.int).tolist()
+        bbox = np.round(bbox).astype(np.int64).tolist()
         cv2.rectangle(self.image, tuple(bbox[0]), tuple(bbox[1]), color, lw)
 
     @staticmethod
     def _convert_pt(point: np.ndarray) -> Tuple[int, int]:
-        return tuple(np.round(point).astype(np.int).tolist())
+        return tuple(np.round(point).astype(np.int64).tolist())
 
     def draw_points(self,
                     points: np.ndarray,
@@ -71,7 +71,7 @@ class Visualizer:
         assert face.head_position is not None
         assert face.landmarks is not None
         # Get the axes of the model coordinate system
-        axes3d = np.eye(3, dtype=np.float) @ Rotation.from_euler(
+        axes3d = np.eye(3, dtype=float) @ Rotation.from_euler(
             'XYZ', [0, np.pi, 0]).as_matrix()
         axes3d = axes3d * length
         axes2d = self._camera.project_points(axes3d,
