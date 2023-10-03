@@ -20,8 +20,10 @@ class Model(torchvision.models.ResNet):
 
         pretrained_name = config.model.backbone.pretrained
         if pretrained_name:
-            state_dict = torch.hub.load_state_dict_from_url(
-                torchvision.models.resnet.model_urls[pretrained_name])
+            if pretrained_name != 'resnet18':
+                raise NotImplementedError()
+            url = torchvision.models.resnet.ResNet18_Weights.IMAGENET1K_V1.url
+            state_dict = torch.hub.load_state_dict_from_url(url)
             self.load_state_dict(state_dict, strict=False)
             # While the pretrained models of torchvision are trained
             # using images with RGB channel order, in this repository
