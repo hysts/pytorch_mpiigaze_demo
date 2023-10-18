@@ -1,15 +1,17 @@
 import logging
 from typing import List
-
+import torch.nn.functional as F
 import numpy as np
 import torch
 from omegaconf import DictConfig
 
-from .common import Camera, Face, FacePartsName
-from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
-from .models import create_model
-from .transforms import create_transform
-from .utils import get_3d_face_model
+from common.camera import Camera
+from common.face import Face, FacePartsName
+from head_pose_estimation.face_landmark_estimator import LandmarkEstimator
+from head_pose_estimation.head_pose_normalizer import HeadPoseNormalizer
+from models import create_model
+from transforms import create_transform
+from utils import get_3d_face_model
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +113,19 @@ class GazeEstimator:
 
     @torch.no_grad()
     def _run_ethxgaze_model(self, face: Face) -> None:
-        image = self._transform(face.normalized_image).unsqueeze(0)
+        def hook_fn(module, input, output):
+            layer4_output = output
+            pooled_output = F.adaptive_avg_pool2d(layer4_output, (1, 1))
+            flattened_output = pooled_output.view(512)
+            print(flattened_output)
 
+        hook_handle = self._gaze_estimation_model.layer4.register_forward_hook(hook_fn)
+        image = self._transform(face.normalized_image).unsqueeze(0)
         device = torch.device(self._config.device)
         image = image.to(device)
         prediction = self._gaze_estimation_model(image)
+        hook_handle.remove()
         prediction = prediction.cpu().numpy()
-
         face.normalized_gaze_angles = prediction[0]
         face.angle_to_vector()
         face.denormalize_gaze_vector()

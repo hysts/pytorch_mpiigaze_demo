@@ -9,46 +9,16 @@ import torch.hub
 import yaml
 from omegaconf import DictConfig
 
-from .common.face_model import FaceModel
-from .common.face_model_68 import FaceModel68
-from .common.face_model_mediapipe import FaceModelMediaPipe
+from ptgaze.common.face_model import FaceModel
+from ptgaze.common.face_model_68 import FaceModel68
+from ptgaze.common.face_model_mediapipe import FaceModelMediaPipe
 
 logger = logging.getLogger(__name__)
 
 
 def get_3d_face_model(config: DictConfig) -> FaceModel:
-    if config.face_detector.mode == 'mediapipe':
-        return FaceModelMediaPipe()
-    else:
-        return FaceModel68()
 
-
-def download_dlib_pretrained_model() -> None:
-    logger.debug('Called download_dlib_pretrained_model()')
-
-    dlib_model_dir = pathlib.Path('~/.ptgaze/dlib/').expanduser()
-    dlib_model_dir.mkdir(exist_ok=True, parents=True)
-    dlib_model_path = dlib_model_dir / 'shape_predictor_68_face_landmarks.dat'
-    logger.debug(
-        f'Update config.face_detector.dlib_model_path to {dlib_model_path.as_posix()}'
-    )
-
-    if dlib_model_path.exists():
-        logger.debug(
-            f'dlib pretrained model {dlib_model_path.as_posix()} already exists.'
-        )
-        return
-
-    logger.debug('Download the dlib pretrained model')
-    bz2_path = dlib_model_path.as_posix() + '.bz2'
-    torch.hub.download_url_to_file(
-        'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2',
-        bz2_path)
-    with bz2.BZ2File(bz2_path, 'rb') as f_in, open(dlib_model_path,
-                                                   'wb') as f_out:
-        data = f_in.read()
-        f_out.write(data)
-
+    return FaceModelMediaPipe()
 
 def download_mpiigaze_model() -> pathlib.Path:
     logger.debug('Called _download_mpiigaze_model()')
@@ -171,6 +141,7 @@ def _check_path(config: DictConfig, key: str) -> None:
 
 
 def check_path_all(config: DictConfig) -> None:
+    print("check path all")
     if config.face_detector.mode == 'dlib':
         _check_path(config, 'face_detector.dlib_model_path')
     _check_path(config, 'gaze_estimator.checkpoint')

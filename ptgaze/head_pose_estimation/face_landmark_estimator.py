@@ -1,110 +1,61 @@
 from typing import List
-
-import dlib
-import face_alignment
-import face_alignment.detection.sfd
-import mediapipe
+import mediapipe as mp
+import cv2
+from face_detection import RetinaFace
 import numpy as np
 from omegaconf import DictConfig
-
-from ..common import Face
-
+from ptgaze.common.face import Face
 
 class LandmarkEstimator:
     def __init__(self, config: DictConfig):
         self.mode = config.face_detector.mode
-        if self.mode == 'dlib':
-            self.detector = dlib.get_frontal_face_detector()
-            self.predictor = dlib.shape_predictor(
-                config.face_detector.dlib_model_path)
-        elif self.mode == 'face_alignment_dlib':
-            self.detector = dlib.get_frontal_face_detector()
-            self.predictor = face_alignment.FaceAlignment(
-                face_alignment.LandmarksType._2D,
-                face_detector='dlib',
-                flip_input=False,
-                device=config.device)
-        elif self.mode == 'face_alignment_sfd':
-            self.detector = face_alignment.detection.sfd.sfd_detector.SFDDetector(
-                device=config.device)
-            self.predictor = face_alignment.FaceAlignment(
-                face_alignment.LandmarksType._2D,
-                flip_input=False,
-                device=config.device)
-        elif self.mode == 'mediapipe':
-            self.detector = mediapipe.solutions.face_mesh.FaceMesh(
-                max_num_faces=config.face_detector.mediapipe_max_num_faces,
-                static_image_mode=config.face_detector.
-                mediapipe_static_image_mode)
-        else:
-            raise ValueError
+        self.detector = RetinaFace()
+        self.predictor = mp.solutions.face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1,
+                                                             min_detection_confidence=0.5)
 
     def detect_faces(self, image: np.ndarray) -> List[Face]:
-        if self.mode == 'dlib':
-            return self._detect_faces_dlib(image)
-        elif self.mode == 'face_alignment_dlib':
-            return self._detect_faces_face_alignment_dlib(image)
-        elif self.mode == 'face_alignment_sfd':
-            return self._detect_faces_face_alignment_sfd(image)
-        elif self.mode == 'mediapipe':
-            return self._detect_faces_mediapipe(image)
-        else:
-            raise ValueError
+        return self._detect_faces_retina_face(image)
 
-    def _detect_faces_dlib(self, image: np.ndarray) -> List[Face]:
-        bboxes = self.detector(image[:, :, ::-1], 0)
+    def _detect_faces_retina_face(self, image: np.ndarray) -> List[Face]:
+        # Detect faces using RetinaFace
+        faces = self.detector(image[:, :, ::-1])
         detected = []
-        for bbox in bboxes:
-            predictions = self.predictor(image[:, :, ::-1], bbox)
-            landmarks = np.array([(pt.x, pt.y) for pt in predictions.parts()],
-                                 dtype=np.float)
-            bbox = np.array([[bbox.left(), bbox.top()],
-                             [bbox.right(), bbox.bottom()]],
-                            dtype=np.float)
-            detected.append(Face(bbox, landmarks))
+
+        for face in faces:
+            box, _, score = face
+
+            if score > 0.95:
+                x, y, w, h = [int(val) for val in box]
+                # Ensure coordinates are within image bounds
+                x = max(0, x)
+                y = max(0, y)
+                # Adjust the width and height to be more balanced
+                w = h
+                # Extract the face region
+                face_img = image[y:y + h, x:x + w]
+
+                landmarks = self._media_pipe_land_marker(face_img, x, y, h, w)
+
+                if landmarks is not None:
+                    detected.append(Face(box, landmarks))
+                else:
+                    if len(detected) > 0:
+                        print("use pre land marks")
+                        detected.append(Face(box,detected[-1].landmarks))
+
+
         return detected
 
-    def _detect_faces_face_alignment_dlib(self,
-                                          image: np.ndarray) -> List[Face]:
-        bboxes = self.detector(image[:, :, ::-1], 0)
-        bboxes = [[bbox.left(),
-                   bbox.top(),
-                   bbox.right(),
-                   bbox.bottom()] for bbox in bboxes]
-        predictions = self.predictor.get_landmarks(image[:, :, ::-1],
-                                                   detected_faces=bboxes)
-        if predictions is None:
-            predictions = []
-        detected = []
-        for bbox, landmarks in zip(bboxes, predictions):
-            bbox = np.array(bbox, dtype=np.float).reshape(2, 2)
-            detected.append(Face(bbox, landmarks))
-        return detected
+    def _media_pipe_land_marker(self, face_img,x,y,h,w) :
 
-    def _detect_faces_face_alignment_sfd(self,
-                                         image: np.ndarray) -> List[Face]:
-        bboxes = self.detector.detect_from_image(image[:, :, ::-1].copy())
-        bboxes = [bbox[:4] for bbox in bboxes]
-        predictions = self.predictor.get_landmarks(image[:, :, ::-1],
-                                                   detected_faces=bboxes)
-        if predictions is None:
-            predictions = []
-        detected = []
-        for bbox, landmarks in zip(bboxes, predictions):
-            bbox = np.array(bbox, dtype=np.float).reshape(2, 2)
-            detected.append(Face(bbox, landmarks))
-        return detected
+        # Convert the cropped face image to RGB
+        face_rgb = cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB)
+        # Process the face image
+        results = self.predictor.process(face_rgb)
 
-    def _detect_faces_mediapipe(self, image: np.ndarray) -> List[Face]:
-        h, w = image.shape[:2]
-        predictions = self.detector.process(image[:, :, ::-1])
-        detected = []
-        if predictions.multi_face_landmarks:
-            for prediction in predictions.multi_face_landmarks:
-                pts = np.array([(pt.x * w, pt.y * h)
-                                for pt in prediction.landmark],
-                               dtype=np.float64)
-                bbox = np.vstack([pts.min(axis=0), pts.max(axis=0)])
-                bbox = np.round(bbox).astype(np.int32)
-                detected.append(Face(bbox, pts))
-        return detected
+        # Get the face landmarks
+        if results.multi_face_landmarks:
+            face_landmarks = results.multi_face_landmarks[0].landmark
+            # Convert landmarks to pixel coordinates in the original image
+            landmarks_np = np.array([[int(lm.x * w + x), int(lm.y * h + y)] for lm in face_landmarks],float)
+            return landmarks_np

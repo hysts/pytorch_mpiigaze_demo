@@ -7,9 +7,10 @@ import cv2
 import numpy as np
 from omegaconf import DictConfig
 
-from .common import Face, FacePartsName, Visualizer
-from .gaze_estimator import GazeEstimator
-from .utils import get_3d_face_model
+from common.face import Face, FacePartsName
+from common.visualizer import Visualizer
+from gaze_estimator import GazeEstimator
+from utils import get_3d_face_model
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class Demo:
         self.show_template_model = self.config.demo.show_template_model
 
     def run(self) -> None:
+        print("running demo")
         if self.config.demo.use_camera or self.config.demo.video_path:
             self._run_on_video()
         elif self.config.demo.image_path:
@@ -61,6 +63,7 @@ class Demo:
             cv2.imwrite(output_path.as_posix(), self.visualizer.image)
 
     def _run_on_video(self) -> None:
+        print("run on video")
         while True:
             if self.config.demo.display_on_screen:
                 self._wait_key()
@@ -75,6 +78,7 @@ class Demo:
             if self.config.demo.display_on_screen:
                 cv2.imshow('frame', self.visualizer.image)
         self.cap.release()
+        print("done run on video")
         if self.writer:
             self.writer.release()
 

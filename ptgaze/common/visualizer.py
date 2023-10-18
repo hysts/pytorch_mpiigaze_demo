@@ -23,14 +23,20 @@ class Visualizer:
                   bbox: np.ndarray,
                   color: Tuple[int, int, int] = (0, 255, 0),
                   lw: int = 1) -> None:
-        assert self.image is not None
-        assert bbox.shape == (2, 2)
-        bbox = np.round(bbox).astype(np.int).tolist()
-        cv2.rectangle(self.image, tuple(bbox[0]), tuple(bbox[1]), color, lw)
+        x_min = int(bbox[0])
+        if x_min < 0:
+            x_min = 0
+        y_min = int(bbox[1])
+        if y_min < 0:
+            y_min = 0
+        x_max = int(bbox[2])
+        y_max = int(bbox[3])
+
+        cv2.rectangle(self.image, (x_min, y_min), (x_max, y_max), (0, 255, 0), 1)
 
     @staticmethod
     def _convert_pt(point: np.ndarray) -> Tuple[int, int]:
-        return tuple(np.round(point).astype(np.int).tolist())
+        return tuple(np.round(point).astype(int).tolist())
 
     def draw_points(self,
                     points: np.ndarray,

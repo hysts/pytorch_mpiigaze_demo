@@ -6,14 +6,13 @@ import warnings
 import torch
 from omegaconf import DictConfig, OmegaConf
 
-from .demo import Demo
-from .utils import (check_path_all, download_dlib_pretrained_model,
+from demo import Demo
+from utils import (check_path_all,
                     download_ethxgaze_model, download_mpiifacegaze_model,
                     download_mpiigaze_model, expanduser_all,
                     generate_dummy_camera_params)
 
 logger = logging.getLogger(__name__)
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -31,15 +30,6 @@ def parse_args() -> argparse.Namespace:
         help='With \'mpiigaze\', MPIIGaze model will be used. '
         'With \'mpiifacegaze\', MPIIFaceGaze model will be used. '
         'With \'eth-xgaze\', ETH-XGaze model will be used.')
-    parser.add_argument(
-        '--face-detector',
-        type=str,
-        default='mediapipe',
-        choices=[
-            'dlib', 'face_alignment_dlib', 'face_alignment_sfd', 'mediapipe'
-        ],
-        help='The method used to detect faces and find face landmarks '
-        '(default: \'mediapipe\')')
     parser.add_argument('--device',
                         type=str,
                         choices=['cpu', 'cuda'],
@@ -89,8 +79,6 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
     config = OmegaConf.load(path)
     config.PACKAGE_ROOT = package_root.as_posix()
 
-    if args.face_detector:
-        config.face_detector.mode = args.face_detector
     if args.device:
         config.device = args.device
     if config.device == 'cuda' and not torch.cuda.is_available():
@@ -139,8 +127,7 @@ def main():
     OmegaConf.set_readonly(config, True)
     logger.info(OmegaConf.to_yaml(config))
 
-    if config.face_detector.mode == 'dlib':
-        download_dlib_pretrained_model()
+
     if args.mode:
         if config.mode == 'MPIIGaze':
             download_mpiigaze_model()
