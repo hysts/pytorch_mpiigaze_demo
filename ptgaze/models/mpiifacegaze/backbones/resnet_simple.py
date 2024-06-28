@@ -20,8 +20,8 @@ class Model(torchvision.models.ResNet):
 
         pretrained_name = config.model.backbone.pretrained
         if pretrained_name:
-            state_dict = torch.hub.load_state_dict_from_url(
-                torchvision.models.resnet.model_urls[pretrained_name])
+            model = torchvision.models.get_model(pretrained_name, weights='MPIIFaceGaze')
+            state_dict = model.state_dict()
             self.load_state_dict(state_dict, strict=False)
             # While the pretrained models of torchvision are trained
             # using images with RGB channel order, in this repository
