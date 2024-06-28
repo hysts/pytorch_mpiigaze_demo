@@ -25,12 +25,12 @@ class Visualizer:
                   lw: int = 1) -> None:
         assert self.image is not None
         assert bbox.shape == (2, 2)
-        bbox = np.round(bbox).astype(np.int).tolist()
+        bbox = np.round(bbox).astype(int).tolist()
         cv2.rectangle(self.image, tuple(bbox[0]), tuple(bbox[1]), color, lw)
 
     @staticmethod
     def _convert_pt(point: np.ndarray) -> Tuple[int, int]:
-        return tuple(np.round(point).astype(np.int).tolist())
+        return tuple(np.round(point).astype(int).tolist())
 
     def draw_points(self,
                     points: np.ndarray,
