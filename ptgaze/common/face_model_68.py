@@ -94,7 +94,7 @@ class FaceModel68(FaceModel):
         [0., 0.03791103, 0.0180805],
         [-0.00771924, 0.03711846, 0.01940396],
     ],
-                                     dtype=np.float64)
+                                     dtype=float)
 
     REYE_INDICES: np.ndarray = np.array([36, 39])
     LEYE_INDICES: np.ndarray = np.array([42, 45])
