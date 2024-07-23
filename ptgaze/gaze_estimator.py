@@ -79,7 +79,7 @@ class GazeEstimator:
             images.append(image)
             head_poses.append(normalized_head_pose)
         images = torch.stack(images)
-        head_poses = np.array(head_poses).astype(np.float32)
+        head_poses = np.array(head_poses).astype('float32')
         head_poses = torch.from_numpy(head_poses)
 
         device = torch.device(self._config.device)
