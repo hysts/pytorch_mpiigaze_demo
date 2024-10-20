@@ -494,7 +494,7 @@ class FaceModelMediaPipe(FaceModel):
         [0.04253081, -0.03899161, 0.04160299],
         [0.0453, -0.04036865, 0.04135919],
     ],
-                                     dtype=np.float64)
+                                     dtype=float)
 
     REYE_INDICES: np.ndarray = np.array([33, 133])
     LEYE_INDICES: np.ndarray = np.array([362, 263])
