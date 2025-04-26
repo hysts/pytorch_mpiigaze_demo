@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class Demo:
-    QUIT_KEYS = {27, ord("q")}
+    QUIT_KEYS = (27, ord("q"))
 
     def __init__(self, config: DictConfig) -> None:
         self.config = config
