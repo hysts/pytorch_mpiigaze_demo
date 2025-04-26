@@ -125,7 +125,7 @@ def main() -> None:
     if config.gaze_estimator.use_dummy_camera_params:
         generate_dummy_camera_params(config)
 
-    OmegaConf.set_readonly(config, True)
+    OmegaConf.set_readonly(config, True)  # noqa: FBT003
     logger.info(OmegaConf.to_yaml(config))
 
     if config.face_detector.mode == "dlib":
