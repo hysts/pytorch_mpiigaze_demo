@@ -42,7 +42,7 @@ class Demo:
         else:
             raise ValueError
 
-    def _run_on_image(self):
+    def _run_on_image(self) -> None:
         image = cv2.imread(self.config.demo.image_path)
         self._process_image(image)
         if self.config.demo.display_on_screen:
@@ -76,7 +76,7 @@ class Demo:
         if self.writer:
             self.writer.release()
 
-    def _process_image(self, image) -> None:
+    def _process_image(self, image: np.ndarray) -> None:
         undistorted = cv2.undistort(
             image, self.gaze_estimator.camera.camera_matrix, self.gaze_estimator.camera.dist_coefficients
         )
