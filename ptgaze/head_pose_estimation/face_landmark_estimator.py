@@ -49,8 +49,8 @@ class LandmarkEstimator:
         for bbox in bboxes:
             predictions = self.predictor(image[:, :, ::-1], bbox)
             landmarks = np.array([(pt.x, pt.y) for pt in predictions.parts()], dtype=float)
-            bbox = np.array([[bbox.left(), bbox.top()], [bbox.right(), bbox.bottom()]], dtype=float)
-            detected.append(Face(bbox, landmarks))
+            bbox_np = np.array([[bbox.left(), bbox.top()], [bbox.right(), bbox.bottom()]], dtype=float)
+            detected.append(Face(bbox_np, landmarks))
         return detected
 
     def _detect_faces_face_alignment_dlib(self, image: np.ndarray) -> list[Face]:
@@ -61,8 +61,8 @@ class LandmarkEstimator:
             predictions = []
         detected = []
         for bbox, landmarks in zip(bboxes, predictions, strict=False):
-            bbox = np.array(bbox, dtype=float).reshape(2, 2)
-            detected.append(Face(bbox, landmarks))
+            bbox_np = np.array(bbox, dtype=float).reshape(2, 2)
+            detected.append(Face(bbox_np, landmarks))
         return detected
 
     def _detect_faces_face_alignment_sfd(self, image: np.ndarray) -> list[Face]:
@@ -73,8 +73,8 @@ class LandmarkEstimator:
             predictions = []
         detected = []
         for bbox, landmarks in zip(bboxes, predictions, strict=False):
-            bbox = np.array(bbox, dtype=float).reshape(2, 2)
-            detected.append(Face(bbox, landmarks))
+            bbox_np = np.array(bbox, dtype=float).reshape(2, 2)
+            detected.append(Face(bbox_np, landmarks))
         return detected
 
     def _detect_faces_mediapipe(self, image: np.ndarray) -> list[Face]:
