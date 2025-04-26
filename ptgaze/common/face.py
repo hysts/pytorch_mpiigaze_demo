@@ -5,7 +5,7 @@ from .face_parts import FaceParts, FacePartsName
 
 
 class Face(FaceParts):
-    def __init__(self, bbox: np.ndarray, landmarks: np.ndarray):
+    def __init__(self, bbox: np.ndarray, landmarks: np.ndarray) -> None:
         super().__init__(FacePartsName.FACE)
         self.bbox = bbox
         self.landmarks = landmarks

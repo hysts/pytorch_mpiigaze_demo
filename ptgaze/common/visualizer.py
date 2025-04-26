@@ -9,7 +9,7 @@ AXIS_COLORS = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 
 
 class Visualizer:
-    def __init__(self, camera: Camera, center_point_index: int):
+    def __init__(self, camera: Camera, center_point_index: int) -> None:
         self._camera = camera
         self._center_point_index = center_point_index
         self.image: np.ndarray | None = None

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Demo:
     QUIT_KEYS = {27, ord("q")}
 
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig) -> None:
         self.config = config
         self.gaze_estimator = GazeEstimator(config)
         face_model_3d = get_3d_face_model(config)

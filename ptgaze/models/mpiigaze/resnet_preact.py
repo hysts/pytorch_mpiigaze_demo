@@ -5,7 +5,7 @@ from torch import nn
 
 
 class BasicBlock(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, stride: int):
+    def __init__(self, in_channels: int, out_channels: int, stride: int) -> None:
         super().__init__()
 
         self.bn1 = nn.BatchNorm2d(in_channels)
@@ -29,7 +29,7 @@ class BasicBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig) -> None:
         super().__init__()
 
         depth = 8

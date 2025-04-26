@@ -11,7 +11,7 @@ class FacePartsName(enum.Enum):
 
 
 class FaceParts:
-    def __init__(self, name: FacePartsName):
+    def __init__(self, name: FacePartsName) -> None:
         self.name = name
         self.center: np.ndarray | None = None
         self.head_pose_rot: Rotation | None = None

@@ -4,7 +4,7 @@ from omegaconf import DictConfig
 
 
 class Model(torchvision.models.ResNet):
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig) -> None:
         block_name = config.model.backbone.resnet_block
         if block_name == "basic":
             block = torchvision.models.resnet.BasicBlock

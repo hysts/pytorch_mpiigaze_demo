@@ -7,7 +7,7 @@ from .backbones import create_backbone
 
 
 class Model(nn.Module):
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig) -> None:
         super().__init__()
         self.feature_extractor = create_backbone(config)
         n_channels = self.feature_extractor.n_features

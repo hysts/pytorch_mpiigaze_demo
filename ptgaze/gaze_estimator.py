@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class GazeEstimator:
     EYE_KEYS = [FacePartsName.REYE, FacePartsName.LEYE]
 
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig) -> None:
         self._config = config
 
         self._face_model3d = get_3d_face_model(config)

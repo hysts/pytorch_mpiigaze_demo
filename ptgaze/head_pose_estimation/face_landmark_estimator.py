@@ -9,7 +9,7 @@ from ..common import Face
 
 
 class LandmarkEstimator:
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig) -> None:
         self.mode = config.face_detector.mode
         if self.mode == "dlib":
             self.detector = dlib.get_frontal_face_detector()

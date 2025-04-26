@@ -10,7 +10,7 @@ def _normalize_vector(vector: np.ndarray) -> np.ndarray:
 
 
 class HeadPoseNormalizer:
-    def __init__(self, camera: Camera, normalized_camera: Camera, normalized_distance: float):
+    def __init__(self, camera: Camera, normalized_camera: Camera, normalized_distance: float) -> None:
         self.camera = camera
         self.normalized_camera = normalized_camera
         self.normalized_distance = normalized_distance
