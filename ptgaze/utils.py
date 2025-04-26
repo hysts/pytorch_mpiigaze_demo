@@ -101,7 +101,9 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         path = pathlib.Path(config.demo.video_path).expanduser().as_posix()
         cap = cv2.VideoCapture(path)
         if not cap.isOpened():
-            raise RuntimeError(f"{config.demo.video_path} is not opened.")
+            error_msg = f"{config.demo.video_path} is not opened."
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
         h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         cap.release()
@@ -147,9 +149,13 @@ def _check_path(config: DictConfig, key: str) -> None:
     path_str = operator.attrgetter(key)(config)
     path = pathlib.Path(path_str)
     if not path.exists():
-        raise FileNotFoundError(f"config.{key}: {path.as_posix()} not found.")
+        error_msg = f"config.{key}: {path.as_posix()} not found."
+        logger.error(error_msg)
+        raise FileNotFoundError(error_msg)
     if not path.is_file():
-        raise ValueError(f"config.{key}: {path.as_posix()} is not a file.")
+        error_msg = f"config.{key}: {path.as_posix()} is not a file."
+        logger.error(error_msg)
+        raise ValueError(error_msg)
 
 
 def check_path_all(config: DictConfig) -> None:
