@@ -110,7 +110,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
     return config
 
 
-def main():
+def main() -> None:
     args = parse_args()
     if args.debug:
         logging.getLogger("ptgaze").setLevel(logging.DEBUG)
