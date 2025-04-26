@@ -119,7 +119,7 @@ class Demo:
 
     @staticmethod
     def _create_timestamp() -> str:
-        dt = datetime.datetime.now()
+        dt = datetime.datetime.now(tz=datetime.timezone.utc)
         return dt.strftime("%Y%m%d_%H%M%S")
 
     def _create_video_writer(self) -> cv2.VideoWriter | None:
