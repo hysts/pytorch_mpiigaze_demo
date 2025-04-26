@@ -1,5 +1,3 @@
-from typing import List
-
 import dlib
 import face_alignment
 import face_alignment.detection.sfd
