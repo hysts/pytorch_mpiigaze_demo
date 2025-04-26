@@ -1,7 +1,10 @@
 import enum
+from typing import TYPE_CHECKING
 
 import numpy as np
-from scipy.spatial.transform import Rotation
+
+if TYPE_CHECKING:
+    from scipy.spatial.transform import Rotation
 
 
 class FacePartsName(enum.Enum):
