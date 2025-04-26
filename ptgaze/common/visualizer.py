@@ -31,8 +31,8 @@ class Visualizer:
         assert self.image is not None
         assert points.shape[1] == 2
         for pt in points:
-            pt = self._convert_pt(pt)
-            cv2.circle(self.image, pt, size, color, cv2.FILLED)
+            draw_pt = self._convert_pt(pt)
+            cv2.circle(self.image, draw_pt, size, color, cv2.FILLED)
 
     def draw_3d_points(self, points3d: np.ndarray, color: tuple[int, int, int] = (255, 0, 255), size: int = 3) -> None:
         assert self.image is not None
@@ -64,5 +64,5 @@ class Visualizer:
         center = face.landmarks[self._center_point_index]
         center = self._convert_pt(center)
         for pt, color in zip(axes2d, AXIS_COLORS, strict=False):
-            pt = self._convert_pt(pt)
-            cv2.line(self.image, center, pt, color, lw, cv2.LINE_AA)
+            draw_pt = self._convert_pt(pt)
+            cv2.line(self.image, center, draw_pt, color, lw, cv2.LINE_AA)
