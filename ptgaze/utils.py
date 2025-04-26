@@ -28,10 +28,10 @@ def download_dlib_pretrained_model() -> None:
     dlib_model_dir = pathlib.Path("~/.ptgaze/dlib/").expanduser()
     dlib_model_dir.mkdir(exist_ok=True, parents=True)
     dlib_model_path = dlib_model_dir / "shape_predictor_68_face_landmarks.dat"
-    logger.debug(f"Update config.face_detector.dlib_model_path to {dlib_model_path.as_posix()}")
+    logger.debug("Update config.face_detector.dlib_model_path to %s", dlib_model_path.as_posix())
 
     if dlib_model_path.exists():
-        logger.debug(f"dlib pretrained model {dlib_model_path.as_posix()} already exists.")
+        logger.debug("dlib pretrained model %s already exists.", dlib_model_path.as_posix())
         return
 
     logger.debug("Download the dlib pretrained model")
@@ -54,7 +54,7 @@ def download_mpiigaze_model() -> pathlib.Path:
             output_path.as_posix(),
         )
     else:
-        logger.debug(f"The pretrained model {output_path} already exists.")
+        logger.debug("The pretrained model %s already exists.", output_path.as_posix())
     return output_path
 
 
@@ -70,7 +70,7 @@ def download_mpiifacegaze_model() -> pathlib.Path:
             output_path.as_posix(),
         )
     else:
-        logger.debug(f"The pretrained model {output_path} already exists.")
+        logger.debug("The pretrained model %s already exists.", output_path.as_posix())
     return output_path
 
 
@@ -86,7 +86,7 @@ def download_ethxgaze_model() -> pathlib.Path:
             output_path.as_posix(),
         )
     else:
-        logger.debug(f"The pretrained model {output_path} already exists.")
+        logger.debug("The pretrained model %s already exists.", output_path.as_posix())
     return output_path
 
 
@@ -97,7 +97,7 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         image = cv2.imread(path.as_posix())
         h, w = image.shape[:2]
     elif config.demo.video_path:
-        logger.debug(f"Open video {config.demo.video_path}")
+        logger.debug("Open video %s", config.demo.video_path)
         path = pathlib.Path(config.demo.video_path).expanduser().as_posix()
         cap = cv2.VideoCapture(path)
         if not cap.isOpened():
@@ -109,10 +109,10 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         cap.release()
     else:
         raise ValueError
-    logger.debug(f"Frame size is ({w}, {h})")
-    logger.debug(f"Close video {config.demo.video_path}")
+    logger.debug("Frame size is (%d, %d)", w, h)
+    logger.debug("Close video %s", config.demo.video_path)
     with tempfile.NamedTemporaryFile(suffix=".yaml", delete=False) as out_file:
-        logger.debug(f"Create a dummy camera param file {out_file.name}")
+        logger.debug("Create a dummy camera param file %s", out_file.name)
         dic = {
             "image_width": w,
             "image_height": h,
@@ -122,7 +122,7 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         with pathlib.Path(out_file.name).open("w") as f:
             yaml.safe_dump(dic, f)
         config.gaze_estimator.camera_params = out_file.name
-        logger.debug(f"Update config.gaze_estimator.camera_params to {out_file.name}")
+        logger.debug("Update config.gaze_estimator.camera_params to %s", out_file.name)
 
 
 def _expanduser(path: str) -> str:

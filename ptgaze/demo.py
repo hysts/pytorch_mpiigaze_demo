@@ -181,7 +181,7 @@ class Demo:
 
         euler_angles = face.head_pose_rot.as_euler("XYZ", degrees=True)
         pitch, yaw, roll = face.change_coordinate_system(euler_angles)
-        logger.info(f"[head] pitch: {pitch:.2f}, yaw: {yaw:.2f}, roll: {roll:.2f}, distance: {face.distance:.2f}")
+        logger.info("[head] pitch: %.2f, yaw: %.2f, roll: %.2f, distance: %.2f", pitch, yaw, roll, face.distance)
 
     def _draw_landmarks(self, face: Face) -> None:
         if not self.show_landmarks:
@@ -217,10 +217,10 @@ class Demo:
                 eye = getattr(face, key.name.lower())
                 self.visualizer.draw_3d_line(eye.center, eye.center + length * eye.gaze_vector)
                 pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
-                logger.info(f"[{key.name.lower()}] pitch: {pitch:.2f}, yaw: {yaw:.2f}")
+                logger.info("[%s] pitch: %.2f, yaw: %.2f", key.name.lower(), pitch, yaw)
         elif self.config.mode in ["MPIIFaceGaze", "ETH-XGaze"]:
             self.visualizer.draw_3d_line(face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))
-            logger.info(f"[face] pitch: {pitch:.2f}, yaw: {yaw:.2f}")
+            logger.info("[face] pitch: %.2f, yaw: %.2f", pitch, yaw)
         else:
             raise ValueError
