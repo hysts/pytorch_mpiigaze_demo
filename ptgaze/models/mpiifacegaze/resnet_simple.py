@@ -14,11 +14,7 @@ class Model(nn.Module):
         self.feature_extractor = create_backbone(config)
         n_channels = self.feature_extractor.n_features
 
-        self.conv = nn.Conv2d(n_channels,
-                              1,
-                              kernel_size=1,
-                              stride=1,
-                              padding=0)
+        self.conv = nn.Conv2d(n_channels, 1, kernel_size=1, stride=1, padding=0)
         # This model assumes the input image size is 224x224.
         self.fc = nn.Linear(n_channels * 14**2, 2)
 

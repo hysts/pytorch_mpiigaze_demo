@@ -28,14 +28,16 @@ class FaceModel:
         # face is in front of the camera.
         rvec = np.zeros(3, dtype=np.float)
         tvec = np.array([0, 0, 1], dtype=np.float)
-        _, rvec, tvec = cv2.solvePnP(self.LANDMARKS,
-                                     face.landmarks,
-                                     camera.camera_matrix,
-                                     camera.dist_coefficients,
-                                     rvec,
-                                     tvec,
-                                     useExtrinsicGuess=True,
-                                     flags=cv2.SOLVEPNP_ITERATIVE)
+        _, rvec, tvec = cv2.solvePnP(
+            self.LANDMARKS,
+            face.landmarks,
+            camera.camera_matrix,
+            camera.dist_coefficients,
+            rvec,
+            tvec,
+            useExtrinsicGuess=True,
+            flags=cv2.SOLVEPNP_ITERATIVE,
+        )
         rot = Rotation.from_rotvec(rvec)
         face.head_pose_rot = rot
         face.head_position = tvec
@@ -57,13 +59,13 @@ class FaceModel:
         eyes and the nose. The eye centers are defined as the average
         coordinates of the corners of each eye.
         """
-        if mode == 'ETH-XGaze':
-            face.center = face.model3d[np.concatenate(
-                [self.REYE_INDICES, self.LEYE_INDICES,
-                 self.NOSE_INDICES])].mean(axis=0)
+        if mode == "ETH-XGaze":
+            face.center = face.model3d[np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.NOSE_INDICES])].mean(
+                axis=0
+            )
         else:
-            face.center = face.model3d[np.concatenate(
-                [self.REYE_INDICES, self.LEYE_INDICES,
-                 self.MOUTH_INDICES])].mean(axis=0)
+            face.center = face.model3d[
+                np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.MOUTH_INDICES])
+            ].mean(axis=0)
         face.reye.center = face.model3d[self.REYE_INDICES].mean(axis=0)
         face.leye.center = face.model3d[self.LEYE_INDICES].mean(axis=0)

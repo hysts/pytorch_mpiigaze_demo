@@ -6,9 +6,9 @@ from omegaconf import DictConfig
 class Model(torchvision.models.ResNet):
     def __init__(self, config: DictConfig):
         block_name = config.model.backbone.resnet_block
-        if block_name == 'basic':
+        if block_name == "basic":
             block = torchvision.models.resnet.BasicBlock
-        elif block_name == 'bottleneck':
+        elif block_name == "bottleneck":
             block = torchvision.models.resnet.Bottleneck
         else:
             raise ValueError
@@ -20,8 +20,7 @@ class Model(torchvision.models.ResNet):
 
         pretrained_name = config.model.backbone.pretrained
         if pretrained_name:
-            state_dict = torch.hub.load_state_dict_from_url(
-                torchvision.models.resnet.model_urls[pretrained_name])
+            state_dict = torch.hub.load_state_dict_from_url(torchvision.models.resnet.model_urls[pretrained_name])
             self.load_state_dict(state_dict, strict=False)
             # While the pretrained models of torchvision are trained
             # using images with RGB channel order, in this repository

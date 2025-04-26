@@ -19,10 +19,7 @@ class Visualizer:
     def set_image(self, image: np.ndarray) -> None:
         self.image = image
 
-    def draw_bbox(self,
-                  bbox: np.ndarray,
-                  color: Tuple[int, int, int] = (0, 255, 0),
-                  lw: int = 1) -> None:
+    def draw_bbox(self, bbox: np.ndarray, color: Tuple[int, int, int] = (0, 255, 0), lw: int = 1) -> None:
         assert self.image is not None
         assert bbox.shape == (2, 2)
         bbox = np.round(bbox).astype(np.int).tolist()
@@ -32,32 +29,24 @@ class Visualizer:
     def _convert_pt(point: np.ndarray) -> Tuple[int, int]:
         return tuple(np.round(point).astype(np.int).tolist())
 
-    def draw_points(self,
-                    points: np.ndarray,
-                    color: Tuple[int, int, int] = (0, 0, 255),
-                    size: int = 3) -> None:
+    def draw_points(self, points: np.ndarray, color: Tuple[int, int, int] = (0, 0, 255), size: int = 3) -> None:
         assert self.image is not None
         assert points.shape[1] == 2
         for pt in points:
             pt = self._convert_pt(pt)
             cv2.circle(self.image, pt, size, color, cv2.FILLED)
 
-    def draw_3d_points(self,
-                       points3d: np.ndarray,
-                       color: Tuple[int, int, int] = (255, 0, 255),
-                       size=3) -> None:
+    def draw_3d_points(self, points3d: np.ndarray, color: Tuple[int, int, int] = (255, 0, 255), size=3) -> None:
         assert self.image is not None
         assert points3d.shape[1] == 3
         points2d = self._camera.project_points(points3d)
         self.draw_points(points2d, color=color, size=size)
 
-    def draw_3d_line(self,
-                     point0: np.ndarray,
-                     point1: np.ndarray,
-                     color: Tuple[int, int, int] = (255, 255, 0),
-                     lw=1) -> None:
+    def draw_3d_line(
+        self, point0: np.ndarray, point1: np.ndarray, color: Tuple[int, int, int] = (255, 255, 0), lw=1
+    ) -> None:
         assert self.image is not None
-        assert point0.shape == point1.shape == (3, )
+        assert point0.shape == point1.shape == (3,)
         points3d = np.vstack([point0, point1])
         points2d = self._camera.project_points(points3d)
         pt0 = self._convert_pt(points2d[0])
@@ -71,12 +60,9 @@ class Visualizer:
         assert face.head_position is not None
         assert face.landmarks is not None
         # Get the axes of the model coordinate system
-        axes3d = np.eye(3, dtype=np.float) @ Rotation.from_euler(
-            'XYZ', [0, np.pi, 0]).as_matrix()
+        axes3d = np.eye(3, dtype=np.float) @ Rotation.from_euler("XYZ", [0, np.pi, 0]).as_matrix()
         axes3d = axes3d * length
-        axes2d = self._camera.project_points(axes3d,
-                                             face.head_pose_rot.as_rotvec(),
-                                             face.head_position)
+        axes2d = self._camera.project_points(axes3d, face.head_pose_rot.as_rotvec(), face.head_position)
         center = face.landmarks[self._center_point_index]
         center = self._convert_pt(center)
         for pt, color in zip(axes2d, AXIS_COLORS):
