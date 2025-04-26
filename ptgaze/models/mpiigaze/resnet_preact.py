@@ -37,7 +37,9 @@ class Model(nn.Module):
         input_shape = (1, 1, 36, 60)
 
         n_blocks_per_stage = (depth - 2) // 6
-        assert n_blocks_per_stage * 6 + 2 == depth
+        if n_blocks_per_stage * 6 + 2 != depth:
+            error_msg = f"depth must be {n_blocks_per_stage * 6 + 2}, but got {depth}"
+            raise ValueError(error_msg)
 
         n_channels = [base_channels, base_channels * 2, base_channels * 4]
 

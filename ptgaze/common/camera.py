@@ -28,7 +28,9 @@ class Camera:
     def project_points(
         self, points3d: np.ndarray, rvec: np.ndarray | None = None, tvec: np.ndarray | None = None
     ) -> np.ndarray:
-        assert points3d.shape[1] == DIM_3D
+        if points3d.shape[1] != DIM_3D:
+            error_msg = f"points3d must have {DIM_3D} columns, but got {points3d.shape[1]}"
+            raise ValueError(error_msg)
         if rvec is None:
             rvec = np.zeros(DIM_3D, dtype=float)
         if tvec is None:

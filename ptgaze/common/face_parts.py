@@ -6,6 +6,8 @@ import numpy as np
 if TYPE_CHECKING:
     from scipy.spatial.transform import Rotation
 
+DIM_3D = 3
+
 
 class FacePartsName(enum.Enum):
     FACE = enum.auto()
@@ -46,7 +48,9 @@ class FaceParts:
 
     @staticmethod
     def vector_to_angle(vector: np.ndarray) -> np.ndarray:
-        assert vector.shape == (3,)
+        if vector.shape != (DIM_3D,):
+            error_msg = f"vector must have {DIM_3D} columns, but got {vector.shape[0]}"
+            raise ValueError(error_msg)
         x, y, z = vector
         pitch = np.arcsin(-y)
         yaw = np.arctan2(-x, -z)
