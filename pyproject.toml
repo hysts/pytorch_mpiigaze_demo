@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "hysts" }]
 urls = { Homepage = "https://github.com/hysts/pytorch_mpiigaze_demo" }
+license = { file = "LICENSE" }
 dependencies = [
     "dlib>=19.24.8",
     "face-alignment>=1.4.1",
