@@ -12,7 +12,7 @@ class Model(torchvision.models.ResNet):
             block = torchvision.models.resnet.Bottleneck
         else:
             raise ValueError
-        layers = list(config.model.backbone.resnet_layers) + [1]
+        layers = [*list(config.model.backbone.resnet_layers), 1]
         super().__init__(block, layers)
         del self.layer4
         del self.avgpool
