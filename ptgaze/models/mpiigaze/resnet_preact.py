@@ -73,12 +73,10 @@ class Model(nn.Module):
         x = self.stage2(x)
         x = self.stage3(x)
         x = F.relu(self.bn(x), inplace=True)
-        x = F.adaptive_avg_pool2d(x, output_size=1)
-        return x
+        return F.adaptive_avg_pool2d(x, output_size=1)
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         x = self._forward_conv(x)
         x = x.view(x.size(0), -1)
         x = torch.cat([x, y], dim=1)
-        x = self.fc(x)
-        return x
+        return self.fc(x)

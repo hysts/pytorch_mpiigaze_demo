@@ -43,5 +43,4 @@ class Model(torchvision.models.ResNet):
 
         x = self.layer1(x)
         x = self.layer2(x)
-        x = self.layer3(x)
-        return x
+        return self.layer3(x)

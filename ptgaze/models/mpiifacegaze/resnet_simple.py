@@ -21,5 +21,4 @@ class Model(nn.Module):
         y = F.relu(self.conv(x))
         x = x * y
         x = x.view(x.size(0), -1)
-        x = self.fc(x)
-        return x
+        return self.fc(x)
