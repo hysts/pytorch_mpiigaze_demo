@@ -1,7 +1,7 @@
 from typing import Any
 
 import cv2
-import torchvision.transforms as T
+import torchvision.transforms as T  # noqa: N812
 from omegaconf import DictConfig
 
 

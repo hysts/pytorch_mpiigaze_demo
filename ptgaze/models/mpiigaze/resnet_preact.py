@@ -1,5 +1,5 @@
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as F  # noqa: N812
 from omegaconf import DictConfig
 from torch import nn
 
