@@ -7,6 +7,9 @@ from .face import Face
 
 AXIS_COLORS = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
 
+DIM_2D = 2
+DIM_3D = 3
+
 
 class Visualizer:
     def __init__(self, camera: Camera, center_point_index: int) -> None:
@@ -29,14 +32,14 @@ class Visualizer:
 
     def draw_points(self, points: np.ndarray, color: tuple[int, int, int] = (0, 0, 255), size: int = 3) -> None:
         assert self.image is not None
-        assert points.shape[1] == 2
+        assert points.shape[1] == DIM_2D
         for pt in points:
             draw_pt = self._convert_pt(pt)
             cv2.circle(self.image, draw_pt, size, color, cv2.FILLED)
 
     def draw_3d_points(self, points3d: np.ndarray, color: tuple[int, int, int] = (255, 0, 255), size: int = 3) -> None:
         assert self.image is not None
-        assert points3d.shape[1] == 3
+        assert points3d.shape[1] == DIM_3D
         points2d = self._camera.project_points(points3d)
         self.draw_points(points2d, color=color, size=size)
 
@@ -44,7 +47,7 @@ class Visualizer:
         self, point0: np.ndarray, point1: np.ndarray, color: tuple[int, int, int] = (255, 255, 0), lw: int = 1
     ) -> None:
         assert self.image is not None
-        assert point0.shape == point1.shape == (3,)
+        assert point0.shape == point1.shape == (DIM_3D,)
         points3d = np.vstack([point0, point1])
         points2d = self._camera.project_points(points3d)
         pt0 = self._convert_pt(points2d[0])
@@ -58,7 +61,7 @@ class Visualizer:
         assert face.head_position is not None
         assert face.landmarks is not None
         # Get the axes of the model coordinate system
-        axes3d = np.eye(3, dtype=float) @ Rotation.from_euler("XYZ", [0, np.pi, 0]).as_matrix()
+        axes3d = np.eye(DIM_3D, dtype=float) @ Rotation.from_euler("XYZ", [0, np.pi, 0]).as_matrix()
         axes3d = axes3d * length
         axes2d = self._camera.project_points(axes3d, face.head_pose_rot.as_rotvec(), face.head_position)
         center = face.landmarks[self._center_point_index]

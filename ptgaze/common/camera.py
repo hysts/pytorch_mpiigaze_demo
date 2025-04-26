@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 import yaml
 
+DIM_3D = 3
+
 
 @dataclasses.dataclass()
 class Camera:
@@ -26,10 +28,10 @@ class Camera:
     def project_points(
         self, points3d: np.ndarray, rvec: np.ndarray | None = None, tvec: np.ndarray | None = None
     ) -> np.ndarray:
-        assert points3d.shape[1] == 3
+        assert points3d.shape[1] == DIM_3D
         if rvec is None:
-            rvec = np.zeros(3, dtype=float)
+            rvec = np.zeros(DIM_3D, dtype=float)
         if tvec is None:
-            tvec = np.zeros(3, dtype=float)
+            tvec = np.zeros(DIM_3D, dtype=float)
         points2d, _ = cv2.projectPoints(points3d, rvec, tvec, self.camera_matrix, self.dist_coefficients)
         return points2d.reshape(-1, 2)
