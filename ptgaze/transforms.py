@@ -1,11 +1,13 @@
-from typing import Any
+from collections.abc import Callable
 
 import cv2
+import numpy as np
+import torch
 import torchvision.transforms as T  # noqa: N812
 from omegaconf import DictConfig
 
 
-def create_transform(config: DictConfig) -> Any:
+def create_transform(config: DictConfig) -> Callable[[np.ndarray], torch.Tensor]:
     if config.mode == "MPIIGaze":
         return T.ToTensor()
     if config.mode == "MPIIFaceGaze":
@@ -15,7 +17,7 @@ def create_transform(config: DictConfig) -> Any:
     raise ValueError
 
 
-def _create_mpiifacegaze_transform(config: DictConfig) -> Any:
+def _create_mpiifacegaze_transform(config: DictConfig) -> Callable:
     size = tuple(config.gaze_estimator.image_size)
     return T.Compose(
         [
@@ -26,7 +28,7 @@ def _create_mpiifacegaze_transform(config: DictConfig) -> Any:
     )
 
 
-def _create_ethxgaze_transform(config: DictConfig) -> Any:
+def _create_ethxgaze_transform(config: DictConfig) -> Callable:
     size = tuple(config.gaze_estimator.image_size)
     return T.Compose(
         [
