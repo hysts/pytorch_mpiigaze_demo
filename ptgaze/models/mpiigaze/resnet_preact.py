@@ -29,7 +29,7 @@ class BasicBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, config: DictConfig) -> None:
+    def __init__(self, config: DictConfig) -> None:  # noqa: ARG002
         super().__init__()
 
         depth = 8
