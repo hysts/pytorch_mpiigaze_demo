@@ -1,4 +1,5 @@
 import dataclasses
+import pathlib
 
 import cv2
 import numpy as np
@@ -14,8 +15,8 @@ class Camera:
 
     camera_params_path: dataclasses.InitVar[str] = None
 
-    def __post_init__(self, camera_params_path):
-        with open(camera_params_path) as f:
+    def __post_init__(self, camera_params_path: str) -> None:
+        with pathlib.Path(camera_params_path).open() as f:
             data = yaml.safe_load(f)
         self.width = data["image_width"]
         self.height = data["image_height"]

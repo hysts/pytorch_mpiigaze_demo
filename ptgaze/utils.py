@@ -37,7 +37,7 @@ def download_dlib_pretrained_model() -> None:
     logger.debug("Download the dlib pretrained model")
     bz2_path = dlib_model_path.as_posix() + ".bz2"
     torch.hub.download_url_to_file("http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2", bz2_path)
-    with bz2.BZ2File(bz2_path, "rb") as f_in, open(dlib_model_path, "wb") as f_out:
+    with bz2.BZ2File(bz2_path, "rb") as f_in, pathlib.Path(dlib_model_path).open("wb") as f_out:
         data = f_in.read()
         f_out.write(data)
 
@@ -117,7 +117,7 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         "camera_matrix": {"rows": 3, "cols": 3, "data": [w, 0.0, w // 2, 0.0, w, h // 2, 0.0, 0.0, 1.0]},
         "distortion_coefficients": {"rows": 1, "cols": 5, "data": [0.0, 0.0, 0.0, 0.0, 0.0]},
     }
-    with open(out_file.name, "w") as f:
+    with pathlib.Path(out_file.name).open("w") as f:
         yaml.safe_dump(dic, f)
     config.gaze_estimator.camera_params = out_file.name
     logger.debug(f"Update config.gaze_estimator.camera_params to {out_file.name}")
