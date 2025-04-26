@@ -1,0 +1,17 @@
+{
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": false,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnType": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+    "[jupyter]": {
+        "files.insertFinalNewline": false
+    },
+    "notebook.output.scrolling": true,
+    "notebook.formatOnSave.enabled": true
+}

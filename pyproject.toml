@@ -1,0 +1,60 @@
+[project]
+name = "pytorch-mpiigaze-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "dlib>=19.24.8",
+    "face-alignment>=1.4.1",
+    "mediapipe>=0.10.21",
+    "numpy>=1.26.4",
+    "omegaconf>=2.3.0",
+    "opencv-python>=4.11.0.86",
+    "pyyaml>=6.0.2",
+    "scipy>=1.15.2",
+    "timm>=1.0.15",
+    "torch>=2.7.0",
+    "torchvision>=0.22.0",
+]
+
+[tool.ruff]
+line-length = 119
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812", # missing-trailing-comma
+    "D203",   # one-blank-line-before-class
+    "D213",   # multi-line-summary-second-line
+    "E501",   # line-too-long
+    "SIM117", # multiple-with-statements
+    #
+    "D100",    # undocumented-public-module
+    "D101",    # undocumented-public-class
+    "D102",    # undocumented-public-method
+    "D103",    # undocumented-public-function
+    "D104",    # undocumented-public-package
+    "D105",    # undocumented-magic-method
+    "D107",    # undocumented-public-init
+    "EM101",   # raw-string-in-exception
+    "FBT001",  # boolean-type-hint-positional-argument
+    "FBT002",  # boolean-default-value-positional-argument
+    "PD901",   # pandas-df-variable-name
+    "PGH003",  # blanket-type-ignore
+    "PLR0913", # too-many-arguments
+    "PLR0915", # too-many-statements
+    "TRY003",  # raise-vanilla-args
+]
+unfixable = [
+    "F401", # unused-import
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["T201", "T203"]
+
+[tool.ruff.format]
+docstring-code-format = true
