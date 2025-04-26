@@ -14,15 +14,15 @@ class FacePartsName(enum.Enum):
 class FaceParts:
     def __init__(self, name: FacePartsName):
         self.name = name
-        self.center: Optional[np.ndarray] = None
-        self.head_pose_rot: Optional[Rotation] = None
-        self.normalizing_rot: Optional[Rotation] = None
-        self.normalized_head_rot2d: Optional[np.ndarray] = None
-        self.normalized_image: Optional[np.ndarray] = None
+        self.center: np.ndarray | None = None
+        self.head_pose_rot: Rotation | None = None
+        self.normalizing_rot: Rotation | None = None
+        self.normalized_head_rot2d: np.ndarray | None = None
+        self.normalized_image: np.ndarray | None = None
 
-        self.normalized_gaze_angles: Optional[np.ndarray] = None
-        self.normalized_gaze_vector: Optional[np.ndarray] = None
-        self.gaze_vector: Optional[np.ndarray] = None
+        self.normalized_gaze_angles: np.ndarray | None = None
+        self.normalized_gaze_vector: np.ndarray | None = None
+        self.gaze_vector: np.ndarray | None = None
 
     @property
     def distance(self) -> float:

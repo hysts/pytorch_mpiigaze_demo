@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, Union
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from omegaconf import DictConfig
+from torch import nn
 
 from .backbones import create_backbone
 

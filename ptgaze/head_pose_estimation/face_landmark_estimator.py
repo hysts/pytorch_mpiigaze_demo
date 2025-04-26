@@ -34,53 +34,52 @@ class LandmarkEstimator:
         else:
             raise ValueError
 
-    def detect_faces(self, image: np.ndarray) -> List[Face]:
+    def detect_faces(self, image: np.ndarray) -> list[Face]:
         if self.mode == "dlib":
             return self._detect_faces_dlib(image)
-        elif self.mode == "face_alignment_dlib":
+        if self.mode == "face_alignment_dlib":
             return self._detect_faces_face_alignment_dlib(image)
-        elif self.mode == "face_alignment_sfd":
+        if self.mode == "face_alignment_sfd":
             return self._detect_faces_face_alignment_sfd(image)
-        elif self.mode == "mediapipe":
+        if self.mode == "mediapipe":
             return self._detect_faces_mediapipe(image)
-        else:
-            raise ValueError
+        raise ValueError
 
-    def _detect_faces_dlib(self, image: np.ndarray) -> List[Face]:
+    def _detect_faces_dlib(self, image: np.ndarray) -> list[Face]:
         bboxes = self.detector(image[:, :, ::-1], 0)
         detected = []
         for bbox in bboxes:
             predictions = self.predictor(image[:, :, ::-1], bbox)
-            landmarks = np.array([(pt.x, pt.y) for pt in predictions.parts()], dtype=np.float)
-            bbox = np.array([[bbox.left(), bbox.top()], [bbox.right(), bbox.bottom()]], dtype=np.float)
+            landmarks = np.array([(pt.x, pt.y) for pt in predictions.parts()], dtype=float)
+            bbox = np.array([[bbox.left(), bbox.top()], [bbox.right(), bbox.bottom()]], dtype=float)
             detected.append(Face(bbox, landmarks))
         return detected
 
-    def _detect_faces_face_alignment_dlib(self, image: np.ndarray) -> List[Face]:
+    def _detect_faces_face_alignment_dlib(self, image: np.ndarray) -> list[Face]:
         bboxes = self.detector(image[:, :, ::-1], 0)
         bboxes = [[bbox.left(), bbox.top(), bbox.right(), bbox.bottom()] for bbox in bboxes]
         predictions = self.predictor.get_landmarks(image[:, :, ::-1], detected_faces=bboxes)
         if predictions is None:
             predictions = []
         detected = []
-        for bbox, landmarks in zip(bboxes, predictions):
-            bbox = np.array(bbox, dtype=np.float).reshape(2, 2)
+        for bbox, landmarks in zip(bboxes, predictions, strict=False):
+            bbox = np.array(bbox, dtype=float).reshape(2, 2)
             detected.append(Face(bbox, landmarks))
         return detected
 
-    def _detect_faces_face_alignment_sfd(self, image: np.ndarray) -> List[Face]:
+    def _detect_faces_face_alignment_sfd(self, image: np.ndarray) -> list[Face]:
         bboxes = self.detector.detect_from_image(image[:, :, ::-1].copy())
         bboxes = [bbox[:4] for bbox in bboxes]
         predictions = self.predictor.get_landmarks(image[:, :, ::-1], detected_faces=bboxes)
         if predictions is None:
             predictions = []
         detected = []
-        for bbox, landmarks in zip(bboxes, predictions):
-            bbox = np.array(bbox, dtype=np.float).reshape(2, 2)
+        for bbox, landmarks in zip(bboxes, predictions, strict=False):
+            bbox = np.array(bbox, dtype=float).reshape(2, 2)
             detected.append(Face(bbox, landmarks))
         return detected
 
-    def _detect_faces_mediapipe(self, image: np.ndarray) -> List[Face]:
+    def _detect_faces_mediapipe(self, image: np.ndarray) -> list[Face]:
         h, w = image.shape[:2]
         predictions = self.detector.process(image[:, :, ::-1])
         detected = []

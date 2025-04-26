@@ -24,12 +24,12 @@ class Camera:
         self.dist_coefficients = np.array(data["distortion_coefficients"]["data"]).reshape(-1, 1)
 
     def project_points(
-        self, points3d: np.ndarray, rvec: Optional[np.ndarray] = None, tvec: Optional[np.ndarray] = None
+        self, points3d: np.ndarray, rvec: np.ndarray | None = None, tvec: np.ndarray | None = None
     ) -> np.ndarray:
         assert points3d.shape[1] == 3
         if rvec is None:
-            rvec = np.zeros(3, dtype=np.float)
+            rvec = np.zeros(3, dtype=float)
         if tvec is None:
-            tvec = np.zeros(3, dtype=np.float)
+            tvec = np.zeros(3, dtype=float)
         points2d, _ = cv2.projectPoints(points3d, rvec, tvec, self.camera_matrix, self.dist_coefficients)
         return points2d.reshape(-1, 2)

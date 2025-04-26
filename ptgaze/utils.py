@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 def get_3d_face_model(config: DictConfig) -> FaceModel:
     if config.face_detector.mode == "mediapipe":
         return FaceModelMediaPipe()
-    else:
-        return FaceModel68()
+    return FaceModel68()
 
 
 def download_dlib_pretrained_model() -> None:

@@ -98,7 +98,7 @@ class Demo:
         if self.writer:
             self.writer.write(self.visualizer.image)
 
-    def _create_capture(self) -> Optional[cv2.VideoCapture]:
+    def _create_capture(self) -> cv2.VideoCapture | None:
         if self.config.demo.image_path:
             return None
         if self.config.demo.use_camera:
@@ -111,9 +111,9 @@ class Demo:
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.gaze_estimator.camera.height)
         return cap
 
-    def _create_output_dir(self) -> Optional[pathlib.Path]:
+    def _create_output_dir(self) -> pathlib.Path | None:
         if not self.config.demo.output_dir:
-            return
+            return None
         output_dir = pathlib.Path(self.config.demo.output_dir)
         output_dir.mkdir(exist_ok=True, parents=True)
         return output_dir
@@ -123,7 +123,7 @@ class Demo:
         dt = datetime.datetime.now()
         return dt.strftime("%Y%m%d_%H%M%S")
 
-    def _create_video_writer(self) -> Optional[cv2.VideoWriter]:
+    def _create_video_writer(self) -> cv2.VideoWriter | None:
         if self.config.demo.image_path:
             return None
         if not self.output_dir:

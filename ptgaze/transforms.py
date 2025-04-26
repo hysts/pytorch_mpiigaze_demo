@@ -8,12 +8,11 @@ from omegaconf import DictConfig
 def create_transform(config: DictConfig) -> Any:
     if config.mode == "MPIIGaze":
         return T.ToTensor()
-    elif config.mode == "MPIIFaceGaze":
+    if config.mode == "MPIIFaceGaze":
         return _create_mpiifacegaze_transform(config)
-    elif config.mode == "ETH-XGaze":
+    if config.mode == "ETH-XGaze":
         return _create_ethxgaze_transform(config)
-    else:
-        raise ValueError
+    raise ValueError
 
 
 def _create_mpiifacegaze_transform(config: DictConfig) -> Any:

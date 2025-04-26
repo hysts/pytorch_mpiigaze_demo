@@ -1,7 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from omegaconf import DictConfig
+from torch import nn
 
 
 class BasicBlock(nn.Module):

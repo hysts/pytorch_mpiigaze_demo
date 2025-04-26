@@ -61,5 +61,5 @@ class HeadPoseNormalizer:
                 [0, 1, 0],
                 [0, 0, self.normalized_distance / distance],
             ],
-            dtype=np.float,
+            dtype=float,
         )

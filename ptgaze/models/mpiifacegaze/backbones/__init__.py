@@ -1,7 +1,7 @@
 import importlib
 
-import torch.nn as nn
 from omegaconf import DictConfig
+from torch import nn
 
 
 def create_backbone(config: DictConfig) -> nn.Module:

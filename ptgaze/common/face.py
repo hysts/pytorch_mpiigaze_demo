@@ -15,8 +15,8 @@ class Face(FaceParts):
         self.reye: Eye = Eye(FacePartsName.REYE)
         self.leye: Eye = Eye(FacePartsName.LEYE)
 
-        self.head_position: Optional[np.ndarray] = None
-        self.model3d: Optional[np.ndarray] = None
+        self.head_position: np.ndarray | None = None
+        self.model3d: np.ndarray | None = None
 
     @staticmethod
     def change_coordinate_system(euler_angles: np.ndarray) -> np.ndarray:

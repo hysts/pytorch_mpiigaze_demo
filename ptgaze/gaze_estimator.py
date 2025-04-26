@@ -40,7 +40,7 @@ class GazeEstimator:
         model.eval()
         return model
 
-    def detect_faces(self, image: np.ndarray) -> List[Face]:
+    def detect_faces(self, image: np.ndarray) -> list[Face]:
         return self._landmark_estimator.detect_faces(image)
 
     def estimate_gaze(self, image: np.ndarray, face: Face) -> None:
