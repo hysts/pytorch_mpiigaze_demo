@@ -34,6 +34,9 @@ only-include = ["ptgaze"]
 [tool.mypy]
 ignore_missing_imports = true
 
+[tool.pytest.ini_options]
+addopts = "-n auto"
+
 [tool.ruff]
 line-length = 119
 
@@ -71,6 +74,11 @@ convention = "google"
 [tool.ruff.lint.per-file-ignores]
 "*.ipynb" = ["T201", "T203"]
 "__init__.py" = ["F401"]
+"tests/**" = [
+    "S101",    # assert-used (pytest tests rely on assert)
+    "PLR2004", # magic-value-comparison
+    "INP001",  # implicit-namespace-package (tests dir has no __init__.py)
+]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -79,5 +87,7 @@ docstring-code-format = true
 dev = [
     "mypy>=2.1.0",
     "pre-commit>=4.6.0",
+    "pytest>=9.1.1",
+    "pytest-xdist>=3.8.0",
     "ruff>=0.15.20",
 ]
