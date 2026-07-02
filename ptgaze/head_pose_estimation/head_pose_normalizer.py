@@ -46,9 +46,12 @@ class HeadPoseNormalizer:
     def _normalize_head_pose(eye_or_face: FaceParts) -> None:
         if eye_or_face.head_pose_rot is None or eye_or_face.normalizing_rot is None:
             raise ValueError("head_pose_rot and normalizing_rot must be set")
-        normalized_head_rot = eye_or_face.head_pose_rot * eye_or_face.normalizing_rot
-        euler_angles2d = normalized_head_rot.as_euler("XYZ")[:2]
-        eye_or_face.normalized_head_rot2d = euler_angles2d * np.array([1, -1])
+        # The MPIIGaze dataset annotation defines the normalized head pose as
+        # the pitch and yaw of the z-axis of the normalized head rotation
+        # matrix R @ hR, i.e. (arcsin(z_y), arctan2(z_x, z_z)).
+        normalized_head_rot = eye_or_face.normalizing_rot * eye_or_face.head_pose_rot
+        z_axis = normalized_head_rot.as_matrix()[:, 2]
+        eye_or_face.normalized_head_rot2d = np.array([np.arcsin(z_axis[1]), np.arctan2(z_axis[0], z_axis[2])])
 
     @staticmethod
     def _compute_normalizing_rotation(center: np.ndarray, head_rot: Rotation) -> Rotation:
