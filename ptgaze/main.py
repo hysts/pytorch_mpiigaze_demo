@@ -66,6 +66,32 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _apply_input_overrides(config: DictConfig, args: argparse.Namespace) -> None:
+    if args.image and args.video:
+        raise ValueError("Only one of --image or --video can be specified.")
+    if args.image:
+        config.demo.image_path = args.image
+        config.demo.use_camera = False
+    if args.video:
+        config.demo.video_path = args.video
+        config.demo.use_camera = False
+    if args.camera:
+        config.gaze_estimator.camera_params = args.camera
+    elif args.image or args.video:
+        config.gaze_estimator.use_dummy_camera_params = True
+
+
+def _apply_output_overrides(config: DictConfig, args: argparse.Namespace) -> None:
+    if args.output_dir:
+        config.demo.output_dir = args.output_dir
+    if args.ext:
+        config.demo.output_file_extension = args.ext
+    if args.no_screen:
+        config.demo.display_on_screen = False
+        if not config.demo.output_dir:
+            config.demo.output_dir = "outputs"
+
+
 def load_mode_config(args: argparse.Namespace) -> DictConfig:
     package_root = pathlib.Path(__file__).parent.resolve()
     if args.mode == "mpiigaze":
@@ -86,26 +112,8 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
     if config.device == "cuda" and not torch.cuda.is_available():
         config.device = "cpu"
         warnings.warn("Run on CPU because CUDA is not available.", stacklevel=2)
-    if args.image and args.video:
-        raise ValueError("Only one of --image or --video can be specified.")
-    if args.image:
-        config.demo.image_path = args.image
-        config.demo.use_camera = False
-    if args.video:
-        config.demo.video_path = args.video
-        config.demo.use_camera = False
-    if args.camera:
-        config.gaze_estimator.camera_params = args.camera
-    elif args.image or args.video:
-        config.gaze_estimator.use_dummy_camera_params = True
-    if args.output_dir:
-        config.demo.output_dir = args.output_dir
-    if args.ext:
-        config.demo.output_file_extension = args.ext
-    if args.no_screen:
-        config.demo.display_on_screen = False
-        if not config.demo.output_dir:
-            config.demo.output_dir = "outputs"
+    _apply_input_overrides(config, args)
+    _apply_output_overrides(config, args)
 
     return config
 

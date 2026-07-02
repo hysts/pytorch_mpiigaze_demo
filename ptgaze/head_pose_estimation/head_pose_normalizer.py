@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from ..common import Camera, FaceParts, FacePartsName
+from ptgaze.common import Camera, FaceParts, FacePartsName
 
 
 def _normalize_vector(vector: np.ndarray) -> np.ndarray:

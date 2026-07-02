@@ -5,7 +5,7 @@ import mediapipe
 import numpy as np
 from omegaconf import DictConfig
 
-from ..common import Face
+from ptgaze.common import Face
 
 
 class LandmarkEstimator:
@@ -17,12 +17,12 @@ class LandmarkEstimator:
         elif self.mode == "face_alignment_dlib":
             self.detector = dlib.get_frontal_face_detector()
             self.predictor = face_alignment.FaceAlignment(
-                face_alignment.LandmarksType._2D, face_detector="dlib", flip_input=False, device=config.device
+                face_alignment.LandmarksType.TWO_D, face_detector="dlib", flip_input=False, device=config.device
             )
         elif self.mode == "face_alignment_sfd":
             self.detector = face_alignment.detection.sfd.sfd_detector.SFDDetector(device=config.device)
             self.predictor = face_alignment.FaceAlignment(
-                face_alignment.LandmarksType._2D, flip_input=False, device=config.device
+                face_alignment.LandmarksType.TWO_D, flip_input=False, device=config.device
             )
         elif self.mode == "mediapipe":
             self.detector = mediapipe.solutions.face_mesh.FaceMesh(
