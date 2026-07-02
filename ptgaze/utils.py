@@ -98,8 +98,8 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
         h, w = image.shape[:2]
     elif config.demo.video_path:
         logger.debug("Open video %s", config.demo.video_path)
-        path = pathlib.Path(config.demo.video_path).expanduser().as_posix()
-        cap = cv2.VideoCapture(path)
+        video_path = pathlib.Path(config.demo.video_path).expanduser().as_posix()
+        cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             error_msg = f"{config.demo.video_path} is not opened."
             logger.error(error_msg)

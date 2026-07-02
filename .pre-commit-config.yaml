@@ -18,3 +18,13 @@ repos:
       - id: ruff-check
         args: ["--fix"]
       - id: ruff-format
+  - repo: local
+    hooks:
+      # Run mypy from the project environment instead of mirrors-mypy so
+      # that numpy, torch, and other dependencies are visible to it.
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
+        require_serial: true

@@ -16,6 +16,8 @@ class HeadPoseNormalizer:
         self.normalized_distance = normalized_distance
 
     def normalize(self, image: np.ndarray, eye_or_face: FaceParts) -> None:
+        if eye_or_face.center is None:
+            raise ValueError("center is not set")
         eye_or_face.normalizing_rot = self._compute_normalizing_rotation(eye_or_face.center, eye_or_face.head_pose_rot)
         self._normalize_image(image, eye_or_face)
         self._normalize_head_pose(eye_or_face)
@@ -24,6 +26,8 @@ class HeadPoseNormalizer:
         camera_matrix_inv = np.linalg.inv(self.camera.camera_matrix)
         normalized_camera_matrix = self.normalized_camera.camera_matrix
 
+        if eye_or_face.normalizing_rot is None:
+            raise ValueError("normalizing_rot is not set")
         scale = self._get_scale_matrix(eye_or_face.distance)
         conversion_matrix = scale @ eye_or_face.normalizing_rot.as_matrix()
 
@@ -40,6 +44,8 @@ class HeadPoseNormalizer:
 
     @staticmethod
     def _normalize_head_pose(eye_or_face: FaceParts) -> None:
+        if eye_or_face.head_pose_rot is None or eye_or_face.normalizing_rot is None:
+            raise ValueError("head_pose_rot and normalizing_rot must be set")
         normalized_head_rot = eye_or_face.head_pose_rot * eye_or_face.normalizing_rot
         euler_angles2d = normalized_head_rot.as_euler("XYZ")[:2]
         eye_or_face.normalized_head_rot2d = euler_angles2d * np.array([1, -1])

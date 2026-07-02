@@ -30,15 +30,21 @@ class FaceParts:
 
     @property
     def distance(self) -> float:
-        return np.linalg.norm(self.center)
+        if self.center is None:
+            raise ValueError("center is not set")
+        return float(np.linalg.norm(self.center))
 
     def angle_to_vector(self) -> None:
+        if self.normalized_gaze_angles is None:
+            raise ValueError("normalized_gaze_angles is not set")
         pitch, yaw = self.normalized_gaze_angles
         self.normalized_gaze_vector = -np.array(
             [np.cos(pitch) * np.sin(yaw), np.sin(pitch), np.cos(pitch) * np.cos(yaw)]
         )
 
     def denormalize_gaze_vector(self) -> None:
+        if self.normalizing_rot is None:
+            raise ValueError("normalizing_rot is not set")
         normalizing_rot = self.normalizing_rot.as_matrix()
         # Here gaze vector is a row vector, and rotation matrices are
         # orthogonal, so multiplying the rotation matrix from the right is

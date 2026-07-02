@@ -45,6 +45,8 @@ class Demo:
     def _run_on_image(self) -> None:
         image = cv2.imread(self.config.demo.image_path)
         self._process_image(image)
+        if self.visualizer.image is None:
+            raise ValueError("image is not set")
         if self.config.demo.display_on_screen:
             while True:
                 key_pressed = self._wait_key()
@@ -59,6 +61,8 @@ class Demo:
             cv2.imwrite(output_path.as_posix(), self.visualizer.image)
 
     def _run_on_video(self) -> None:
+        if self.cap is None:
+            raise ValueError("video capture is not set")
         while True:
             if self.config.demo.display_on_screen:
                 self._wait_key()
@@ -71,6 +75,8 @@ class Demo:
             self._process_image(frame)
 
             if self.config.demo.display_on_screen:
+                if self.visualizer.image is None:
+                    raise ValueError("image is not set")
                 cv2.imshow("frame", self.visualizer.image)
         self.cap.release()
         if self.writer:
@@ -92,6 +98,8 @@ class Demo:
             self._draw_gaze_vector(face)
             self._display_normalized_image(face)
 
+        if self.visualizer.image is None:
+            raise ValueError("image is not set")
         if self.config.demo.use_camera:
             self.visualizer.image = self.visualizer.image[:, ::-1]
         if self.writer:
@@ -129,9 +137,9 @@ class Demo:
             return None
         ext = self.config.demo.output_file_extension
         if ext == "mp4":
-            fourcc = cv2.VideoWriter_fourcc(*"H264")
+            fourcc = cv2.VideoWriter.fourcc(*"H264")
         elif ext == "avi":
-            fourcc = cv2.VideoWriter_fourcc(*"PIM1")
+            fourcc = cv2.VideoWriter.fourcc(*"PIM1")
         else:
             raise ValueError
         if self.config.demo.use_camera:
@@ -179,6 +187,8 @@ class Demo:
         length = self.config.demo.head_pose_axis_length
         self.visualizer.draw_model_axes(face, length, lw=2)
 
+        if face.head_pose_rot is None:
+            raise ValueError("head_pose_rot is not set")
         euler_angles = face.head_pose_rot.as_euler("XYZ", degrees=True)
         pitch, yaw, roll = face.change_coordinate_system(euler_angles)
         logger.info("[head] pitch: %.2f, yaw: %.2f, roll: %.2f, distance: %.2f", pitch, yaw, roll, face.distance)
@@ -191,6 +201,8 @@ class Demo:
     def _draw_face_template_model(self, face: Face) -> None:
         if not self.show_template_model:
             return
+        if face.model3d is None:
+            raise ValueError("model3d is not set")
         self.visualizer.draw_3d_points(face.model3d, color=(255, 0, 525), size=1)
 
     def _display_normalized_image(self, face: Face) -> None:
@@ -201,8 +213,12 @@ class Demo:
         if self.config.mode == "MPIIGaze":
             reye = face.reye.normalized_image
             leye = face.leye.normalized_image
+            if reye is None or leye is None:
+                raise ValueError("normalized_image is not set")
             normalized = np.hstack([reye, leye])
         elif self.config.mode in ["MPIIFaceGaze", "ETH-XGaze"]:
+            if face.normalized_image is None:
+                raise ValueError("normalized_image is not set")
             normalized = face.normalized_image
         else:
             raise ValueError
@@ -219,6 +235,8 @@ class Demo:
                 pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
                 logger.info("[%s] pitch: %.2f, yaw: %.2f", key.name.lower(), pitch, yaw)
         elif self.config.mode in ["MPIIFaceGaze", "ETH-XGaze"]:
+            if face.center is None or face.gaze_vector is None:
+                raise ValueError("center and gaze_vector must be set")
             self.visualizer.draw_3d_line(face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))
             logger.info("[face] pitch: %.2f, yaw: %.2f", pitch, yaw)

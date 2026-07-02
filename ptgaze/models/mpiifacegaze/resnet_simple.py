@@ -1,3 +1,5 @@
+from typing import cast
+
 import torch
 import torch.nn.functional as F  # noqa: N812
 from omegaconf import DictConfig
@@ -10,7 +12,7 @@ class Model(nn.Module):
     def __init__(self, config: DictConfig) -> None:
         super().__init__()
         self.feature_extractor = create_backbone(config)
-        n_channels = self.feature_extractor.n_features
+        n_channels = cast("int", self.feature_extractor.n_features)
 
         self.conv = nn.Conv2d(n_channels, 1, kernel_size=1, stride=1, padding=0)
         # This model assumes the input image size is 224x224.

@@ -46,6 +46,8 @@ class FaceModel:
 
     def compute_3d_pose(self, face: Face) -> None:
         """Compute the transformed model."""
+        if face.head_pose_rot is None:
+            raise ValueError("head_pose_rot is not set")
         rot = face.head_pose_rot.as_matrix()
         face.model3d = self.LANDMARKS @ rot.T + face.head_position
 
@@ -59,6 +61,8 @@ class FaceModel:
         eyes and the nose. The eye centers are defined as the average
         coordinates of the corners of each eye.
         """
+        if face.model3d is None:
+            raise ValueError("model3d is not set")
         if mode == "ETH-XGaze":
             face.center = face.model3d[np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.NOSE_INDICES])].mean(
                 axis=0

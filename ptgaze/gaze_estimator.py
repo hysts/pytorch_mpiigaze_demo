@@ -75,14 +75,11 @@ class GazeEstimator:
             image = self._transform(image)
             images.append(image)
             head_poses.append(normalized_head_pose)
-        images = torch.stack(images)
-        head_poses = np.array(head_poses).astype(np.float32)
-        head_poses = torch.from_numpy(head_poses)
 
         device = torch.device(self._config.device)
-        images = images.to(device)
-        head_poses = head_poses.to(device)
-        predictions = self._gaze_estimation_model(images, head_poses)
+        images_tensor = torch.stack(images).to(device)
+        head_poses_tensor = torch.from_numpy(np.array(head_poses).astype(np.float32)).to(device)
+        predictions = self._gaze_estimation_model(images_tensor, head_poses_tensor)
         predictions = predictions.cpu().numpy()
 
         for i, key in enumerate(self.EYE_KEYS):
@@ -95,6 +92,8 @@ class GazeEstimator:
 
     @torch.no_grad()
     def _run_mpiifacegaze_model(self, face: Face) -> None:
+        if face.normalized_image is None:
+            raise ValueError("normalized_image is not set")
         image = self._transform(face.normalized_image).unsqueeze(0)
 
         device = torch.device(self._config.device)
@@ -108,6 +107,8 @@ class GazeEstimator:
 
     @torch.no_grad()
     def _run_ethxgaze_model(self, face: Face) -> None:
+        if face.normalized_image is None:
+            raise ValueError("normalized_image is not set")
         image = self._transform(face.normalized_image).unsqueeze(0)
 
         device = torch.device(self._config.device)

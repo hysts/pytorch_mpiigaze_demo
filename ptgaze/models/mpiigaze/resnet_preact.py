@@ -58,7 +58,7 @@ class Model(nn.Module):
 
     @staticmethod
     def _make_stage(
-        in_channels: int, out_channels: int, n_blocks: int, block: torch.nn.Module, stride: int
+        in_channels: int, out_channels: int, n_blocks: int, block: type[BasicBlock], stride: int
     ) -> torch.nn.Module:
         stage = nn.Sequential()
         for index in range(n_blocks):

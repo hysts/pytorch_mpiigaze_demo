@@ -66,6 +66,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _load_config_file(path: str | pathlib.Path) -> DictConfig:
+    config = OmegaConf.load(path)
+    if not isinstance(config, DictConfig):
+        error_msg = "The config file must define a mapping, not a list."
+        raise TypeError(error_msg)
+    return config
+
+
 def _apply_input_overrides(config: DictConfig, args: argparse.Namespace) -> None:
     if args.image and args.video:
         raise ValueError("Only one of --image or --video can be specified.")
@@ -102,7 +110,7 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
         path = package_root / "data/configs/eth-xgaze.yaml"
     else:
         raise ValueError
-    config = OmegaConf.load(path)
+    config = _load_config_file(path)
     config.PACKAGE_ROOT = package_root.as_posix()
 
     if args.face_detector:
@@ -124,7 +132,7 @@ def main() -> None:
         logging.getLogger("ptgaze").setLevel(logging.DEBUG)
 
     if args.config:
-        config = OmegaConf.load(args.config)
+        config = _load_config_file(args.config)
     elif args.mode:
         config = load_mode_config(args)
     else:
