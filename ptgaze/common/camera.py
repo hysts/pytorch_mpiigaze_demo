@@ -8,22 +8,36 @@ import yaml
 DIM_3D = 3
 
 
-@dataclasses.dataclass()
+@dataclasses.dataclass(frozen=True)
 class Camera:
-    width: int = dataclasses.field(init=False)
-    height: int = dataclasses.field(init=False)
-    camera_matrix: np.ndarray = dataclasses.field(init=False)
-    dist_coefficients: np.ndarray = dataclasses.field(init=False)
+    width: int
+    height: int
+    camera_matrix: np.ndarray
+    dist_coefficients: np.ndarray
 
-    camera_params_path: dataclasses.InitVar[str] = None
-
-    def __post_init__(self, camera_params_path: str) -> None:
+    @classmethod
+    def from_file(cls, camera_params_path: str) -> "Camera":
         with pathlib.Path(camera_params_path).open() as f:
             data = yaml.safe_load(f)
-        self.width = data["image_width"]
-        self.height = data["image_height"]
-        self.camera_matrix = np.array(data["camera_matrix"]["data"]).reshape(3, 3)
-        self.dist_coefficients = np.array(data["distortion_coefficients"]["data"]).reshape(-1, 1)
+        return cls(
+            width=data["image_width"],
+            height=data["image_height"],
+            camera_matrix=np.array(data["camera_matrix"]["data"]).reshape(3, 3),
+            dist_coefficients=np.array(data["distortion_coefficients"]["data"]).reshape(-1, 1),
+        )
+
+    @classmethod
+    def create_dummy(cls, width: int, height: int) -> "Camera":
+        """Create a camera with a focal length equal to the image width and no distortion."""
+        camera_matrix = np.array(
+            [
+                [width, 0, width // 2],
+                [0, width, height // 2],
+                [0, 0, 1],
+            ],
+            dtype=float,
+        )
+        return cls(width=width, height=height, camera_matrix=camera_matrix, dist_coefficients=np.zeros((5, 1)))
 
     def project_points(
         self, points3d: np.ndarray, rvec: np.ndarray | None = None, tvec: np.ndarray | None = None

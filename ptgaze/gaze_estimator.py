@@ -24,8 +24,14 @@ class GazeEstimator:
 
         self._face_model3d = get_3d_face_model(config)
 
-        self.camera = Camera(config.gaze_estimator.camera_params)
-        self._normalized_camera = Camera(config.gaze_estimator.normalized_camera_params)
+        if config.gaze_estimator.use_dummy_camera_params:
+            if config.gaze_estimator.dummy_camera_size is None:
+                raise ValueError("dummy_camera_size is not set")
+            width, height = config.gaze_estimator.dummy_camera_size
+            self.camera = Camera.create_dummy(width, height)
+        else:
+            self.camera = Camera.from_file(config.gaze_estimator.camera_params)
+        self._normalized_camera = Camera.from_file(config.gaze_estimator.normalized_camera_params)
 
         self._landmark_estimator = LandmarkEstimator(config)
         self._head_pose_normalizer = HeadPoseNormalizer(

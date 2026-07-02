@@ -8,11 +8,8 @@ package code, following the MPIIGaze dataset normalization and the
 hysts/pytorch_mpiigaze `tools/preprocess_mpiigaze.py`.
 """
 
-import pathlib
-
 import cv2
 import numpy as np
-import yaml
 from scipy.spatial.transform import Rotation
 
 from ptgaze.common import Camera
@@ -20,29 +17,14 @@ from ptgaze.common.gaze import denormalize_gaze_vector, gaze_angles_to_vector, g
 from ptgaze.head_pose_estimation import HeadPoseNormalizer
 
 
-def _write_camera_params(path: pathlib.Path, width: int, height: int, focal: float) -> Camera:
-    data = {
-        "image_width": width,
-        "image_height": height,
-        "camera_matrix": {
-            "rows": 3,
-            "cols": 3,
-            "data": [focal, 0.0, width / 2, 0.0, focal, height / 2, 0.0, 0.0, 1.0],
-        },
-        "distortion_coefficients": {"rows": 1, "cols": 5, "data": [0.0] * 5},
-    }
-    with path.open("w") as f:
-        yaml.safe_dump(data, f)
-    return Camera(path.as_posix())
+def _make_camera(width: int, height: int, focal: float) -> Camera:
+    camera_matrix = np.array([[focal, 0.0, width / 2], [0.0, focal, height / 2], [0.0, 0.0, 1.0]])
+    return Camera(width=width, height=height, camera_matrix=camera_matrix, dist_coefficients=np.zeros((5, 1)))
 
 
-def _make_normalizer(
-    tmp_path: pathlib.Path, focal_norm: float, distance_norm: float, size: tuple[int, int]
-) -> HeadPoseNormalizer:
-    camera = _write_camera_params(tmp_path / "camera.yaml", 640, 480, 650.0)
-    normalized_camera = _write_camera_params(
-        tmp_path / f"normalized_{focal_norm}_{distance_norm}.yaml", size[0], size[1], focal_norm
-    )
+def _make_normalizer(focal_norm: float, distance_norm: float, size: tuple[int, int]) -> HeadPoseNormalizer:
+    camera = _make_camera(640, 480, 650.0)
+    normalized_camera = _make_camera(size[0], size[1], focal_norm)
     return HeadPoseNormalizer(camera, normalized_camera, distance_norm)
 
 
@@ -80,8 +62,8 @@ def _reference_convert_gaze(vector: np.ndarray) -> np.ndarray:
     return np.array([np.arcsin(-y), np.arctan2(-x, -z)])
 
 
-def test_normalizing_rotation_properties(tmp_path: pathlib.Path) -> None:
-    normalizer = _make_normalizer(tmp_path, 960.0, 0.6, (60, 36))
+def test_normalizing_rotation_properties() -> None:
+    normalizer = _make_normalizer(960.0, 0.6, (60, 36))
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     rng = np.random.default_rng(0)
     for _ in range(50):
@@ -98,8 +80,8 @@ def test_normalizing_rotation_properties(tmp_path: pathlib.Path) -> None:
         np.testing.assert_allclose(normalized_head_x[1], 0, atol=1e-12)
 
 
-def test_normalized_head_pose_matches_mpiigaze_dataset_convention(tmp_path: pathlib.Path) -> None:
-    normalizer = _make_normalizer(tmp_path, 960.0, 0.6, (60, 36))
+def test_normalized_head_pose_matches_mpiigaze_dataset_convention() -> None:
+    normalizer = _make_normalizer(960.0, 0.6, (60, 36))
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     rng = np.random.default_rng(1)
     for _ in range(50):
@@ -109,8 +91,8 @@ def test_normalized_head_pose_matches_mpiigaze_dataset_convention(tmp_path: path
         np.testing.assert_allclose(patch.head_rot2d, expected, atol=1e-8)
 
 
-def test_grayscale_patch_is_single_channel(tmp_path: pathlib.Path) -> None:
-    normalizer = _make_normalizer(tmp_path, 960.0, 0.6, (60, 36))
+def test_grayscale_patch_is_single_channel() -> None:
+    normalizer = _make_normalizer(960.0, 0.6, (60, 36))
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     center = np.array([0.05, -0.03, 0.55])
     head_pose_rot = Rotation.identity()
@@ -140,7 +122,7 @@ def test_denormalize_gaze_vector_inverts_normalizing_rotation() -> None:
         np.testing.assert_allclose(denormalize_gaze_vector(gaze_norm, normalizing_rot), gaze_cam, atol=1e-12)
 
 
-def test_equivalent_normalized_camera_parameters_produce_identical_warp(tmp_path: pathlib.Path) -> None:
+def test_equivalent_normalized_camera_parameters_produce_identical_warp() -> None:
     # The image warp depends only on the ratio focal / distance of the
     # normalized camera. This is why the packaged parameters (e.g. ETH-XGaze:
     # 960 at 0.6 m, 224 px) are equivalent to the dataset normalization
@@ -153,7 +135,7 @@ def test_equivalent_normalized_camera_parameters_produce_identical_warp(tmp_path
 
     warped = []
     for focal_norm, distance_norm in [(960.0, 0.6), (480.0, 0.3), (1600.0, 1.0)]:
-        normalizer = _make_normalizer(tmp_path, focal_norm, distance_norm, (224, 224))
+        normalizer = _make_normalizer(focal_norm, distance_norm, (224, 224))
         patch = normalizer.normalize(image, head_pose_rot, center)
         warped.append(patch.image.astype(np.int16))
 

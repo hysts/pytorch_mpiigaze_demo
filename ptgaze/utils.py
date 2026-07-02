@@ -2,11 +2,9 @@ import bz2
 import logging
 import operator
 import pathlib
-import tempfile
 
 import cv2
 import torch.hub
-import yaml
 from omegaconf import DictConfig
 
 from .common.face_model import FaceModel
@@ -90,8 +88,8 @@ def download_ethxgaze_model() -> pathlib.Path:
     return output_path
 
 
-def generate_dummy_camera_params(config: DictConfig) -> None:
-    logger.debug("Called _generate_dummy_camera_params()")
+def set_dummy_camera_params(config: DictConfig) -> None:
+    logger.debug("Called set_dummy_camera_params()")
     if config.demo.image_path:
         path = pathlib.Path(config.demo.image_path).expanduser()
         image = cv2.imread(path.as_posix())
@@ -110,19 +108,7 @@ def generate_dummy_camera_params(config: DictConfig) -> None:
     else:
         raise ValueError
     logger.debug("Frame size is (%d, %d)", w, h)
-    logger.debug("Close video %s", config.demo.video_path)
-    with tempfile.NamedTemporaryFile(suffix=".yaml", delete=False) as out_file:
-        logger.debug("Create a dummy camera param file %s", out_file.name)
-        dic = {
-            "image_width": w,
-            "image_height": h,
-            "camera_matrix": {"rows": 3, "cols": 3, "data": [w, 0.0, w // 2, 0.0, w, h // 2, 0.0, 0.0, 1.0]},
-            "distortion_coefficients": {"rows": 1, "cols": 5, "data": [0.0, 0.0, 0.0, 0.0, 0.0]},
-        }
-        with pathlib.Path(out_file.name).open("w") as f:
-            yaml.safe_dump(dic, f)
-        config.gaze_estimator.camera_params = out_file.name
-        logger.debug("Update config.gaze_estimator.camera_params to %s", out_file.name)
+    config.gaze_estimator.dummy_camera_size = [w, h]
 
 
 def _expanduser(path: str) -> str:
@@ -135,7 +121,8 @@ def expanduser_all(config: DictConfig) -> None:
     if hasattr(config.face_detector, "dlib_model_path"):
         config.face_detector.dlib_model_path = _expanduser(config.face_detector.dlib_model_path)
     config.gaze_estimator.checkpoint = _expanduser(config.gaze_estimator.checkpoint)
-    config.gaze_estimator.camera_params = _expanduser(config.gaze_estimator.camera_params)
+    if not config.gaze_estimator.use_dummy_camera_params:
+        config.gaze_estimator.camera_params = _expanduser(config.gaze_estimator.camera_params)
     config.gaze_estimator.normalized_camera_params = _expanduser(config.gaze_estimator.normalized_camera_params)
     if hasattr(config.demo, "image_path"):
         config.demo.image_path = _expanduser(config.demo.image_path)
@@ -162,7 +149,8 @@ def check_path_all(config: DictConfig) -> None:
     if config.face_detector.mode == "dlib":
         _check_path(config, "face_detector.dlib_model_path")
     _check_path(config, "gaze_estimator.checkpoint")
-    _check_path(config, "gaze_estimator.camera_params")
+    if not config.gaze_estimator.use_dummy_camera_params:
+        _check_path(config, "gaze_estimator.camera_params")
     _check_path(config, "gaze_estimator.normalized_camera_params")
     if config.demo.image_path:
         _check_path(config, "demo.image_path")

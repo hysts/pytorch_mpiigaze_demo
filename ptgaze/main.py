@@ -6,6 +6,7 @@ import warnings
 import torch
 from omegaconf import DictConfig, OmegaConf
 
+from .config_schema import AppConfig
 from .demo import Demo
 from .mode import GazeEstimationMode
 from .utils import (
@@ -15,7 +16,7 @@ from .utils import (
     download_mpiifacegaze_model,
     download_mpiigaze_model,
     expanduser_all,
-    generate_dummy_camera_params,
+    set_dummy_camera_params,
 )
 
 logger = logging.getLogger(__name__)
@@ -72,7 +73,12 @@ def _load_config_file(path: str | pathlib.Path) -> DictConfig:
     if not isinstance(config, DictConfig):
         error_msg = "The config file must define a mapping, not a list."
         raise TypeError(error_msg)
-    return config
+    # Merging with the structured schema rejects unknown keys and type
+    # mismatches at startup.
+    merged = OmegaConf.merge(OmegaConf.structured(AppConfig), config)
+    if not isinstance(merged, DictConfig):
+        raise TypeError(error_msg)
+    return merged
 
 
 def _apply_input_overrides(config: DictConfig, args: argparse.Namespace) -> None:
@@ -134,13 +140,14 @@ def main() -> None:
 
     if args.config:
         config = _load_config_file(args.config)
+        config.PACKAGE_ROOT = pathlib.Path(__file__).parent.resolve().as_posix()
     elif args.mode:
         config = load_mode_config(args)
     else:
         raise ValueError("You need to specify one of '--mode' or '--config'.")
     expanduser_all(config)
     if config.gaze_estimator.use_dummy_camera_params:
-        generate_dummy_camera_params(config)
+        set_dummy_camera_params(config)
 
     OmegaConf.set_readonly(config, True)  # noqa: FBT003
     logger.info(OmegaConf.to_yaml(config))
