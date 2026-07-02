@@ -6,6 +6,7 @@ from omegaconf import DictConfig
 
 from .common import Camera, Face, FacePartsName
 from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
+from .mode import GazeEstimationMode
 from .models import create_model
 from .transforms import create_transform
 from .utils import get_3d_face_model
@@ -18,6 +19,7 @@ class GazeEstimator:
 
     def __init__(self, config: DictConfig) -> None:
         self._config = config
+        self._mode = GazeEstimationMode(config.mode)
 
         self._face_model3d = get_3d_face_model(config)
 
@@ -45,21 +47,16 @@ class GazeEstimator:
     def estimate_gaze(self, image: np.ndarray, face: Face) -> None:
         self._face_model3d.estimate_head_pose(face, self.camera)
         self._face_model3d.compute_3d_pose(face)
-        self._face_model3d.compute_face_eye_centers(face, self._config.mode)
+        self._face_model3d.compute_face_eye_centers(face, self._mode)
 
-        if self._config.mode == "MPIIGaze":
+        if self._mode.input_is_face:
+            self._head_pose_normalizer.normalize(image, face)
+            self._run_face_model(face)
+        else:
             for key in self.EYE_KEYS:
                 eye = getattr(face, key.name.lower())
                 self._head_pose_normalizer.normalize(image, eye)
             self._run_mpiigaze_model(face)
-        elif self._config.mode == "MPIIFaceGaze":
-            self._head_pose_normalizer.normalize(image, face)
-            self._run_mpiifacegaze_model(face)
-        elif self._config.mode == "ETH-XGaze":
-            self._head_pose_normalizer.normalize(image, face)
-            self._run_ethxgaze_model(face)
-        else:
-            raise ValueError
 
     @torch.no_grad()
     def _run_mpiigaze_model(self, face: Face) -> None:
@@ -91,22 +88,7 @@ class GazeEstimator:
             eye.denormalize_gaze_vector()
 
     @torch.no_grad()
-    def _run_mpiifacegaze_model(self, face: Face) -> None:
-        if face.normalized_image is None:
-            raise ValueError("normalized_image is not set")
-        image = self._transform(face.normalized_image).unsqueeze(0)
-
-        device = torch.device(self._config.device)
-        image = image.to(device)
-        prediction = self._gaze_estimation_model(image)
-        prediction = prediction.cpu().numpy()
-
-        face.normalized_gaze_angles = prediction[0]
-        face.angle_to_vector()
-        face.denormalize_gaze_vector()
-
-    @torch.no_grad()
-    def _run_ethxgaze_model(self, face: Face) -> None:
+    def _run_face_model(self, face: Face) -> None:
         if face.normalized_image is None:
             raise ValueError("normalized_image is not set")
         image = self._transform(face.normalized_image).unsqueeze(0)

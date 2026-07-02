@@ -8,6 +8,7 @@ from omegaconf import DictConfig
 
 from .common import Face, FacePartsName, Visualizer
 from .gaze_estimator import GazeEstimator
+from .mode import GazeEstimationMode
 from .utils import get_3d_face_model
 
 logging.basicConfig(level=logging.INFO)
@@ -19,6 +20,7 @@ class Demo:
 
     def __init__(self, config: DictConfig) -> None:
         self.config = config
+        self.mode = GazeEstimationMode(config.mode)
         self.gaze_estimator = GazeEstimator(config)
         face_model_3d = get_3d_face_model(config)
         self.visualizer = Visualizer(self.gaze_estimator.camera, face_model_3d.NOSE_INDEX)
@@ -210,35 +212,31 @@ class Demo:
             return
         if not self.show_normalized_image:
             return
-        if self.config.mode == "MPIIGaze":
+        if self.mode.input_is_face:
+            if face.normalized_image is None:
+                raise ValueError("normalized_image is not set")
+            normalized = face.normalized_image
+        else:
             reye = face.reye.normalized_image
             leye = face.leye.normalized_image
             if reye is None or leye is None:
                 raise ValueError("normalized_image is not set")
             normalized = np.hstack([reye, leye])
-        elif self.config.mode in ["MPIIFaceGaze", "ETH-XGaze"]:
-            if face.normalized_image is None:
-                raise ValueError("normalized_image is not set")
-            normalized = face.normalized_image
-        else:
-            raise ValueError
         if self.config.demo.use_camera:
             normalized = normalized[:, ::-1]
         cv2.imshow("normalized", normalized)
 
     def _draw_gaze_vector(self, face: Face) -> None:
         length = self.config.demo.gaze_visualization_length
-        if self.config.mode == "MPIIGaze":
-            for key in [FacePartsName.REYE, FacePartsName.LEYE]:
-                eye = getattr(face, key.name.lower())
-                self.visualizer.draw_3d_line(eye.center, eye.center + length * eye.gaze_vector)
-                pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
-                logger.info("[%s] pitch: %.2f, yaw: %.2f", key.name.lower(), pitch, yaw)
-        elif self.config.mode in ["MPIIFaceGaze", "ETH-XGaze"]:
+        if self.mode.input_is_face:
             if face.center is None or face.gaze_vector is None:
                 raise ValueError("center and gaze_vector must be set")
             self.visualizer.draw_3d_line(face.center, face.center + length * face.gaze_vector)
             pitch, yaw = np.rad2deg(face.vector_to_angle(face.gaze_vector))
             logger.info("[face] pitch: %.2f, yaw: %.2f", pitch, yaw)
         else:
-            raise ValueError
+            for key in [FacePartsName.REYE, FacePartsName.LEYE]:
+                eye = getattr(face, key.name.lower())
+                self.visualizer.draw_3d_line(eye.center, eye.center + length * eye.gaze_vector)
+                pitch, yaw = np.rad2deg(eye.vector_to_angle(eye.gaze_vector))
+                logger.info("[%s] pitch: %.2f, yaw: %.2f", key.name.lower(), pitch, yaw)

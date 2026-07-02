@@ -7,6 +7,7 @@ import torch
 from omegaconf import DictConfig, OmegaConf
 
 from .demo import Demo
+from .mode import GazeEstimationMode
 from .utils import (
     check_path_all,
     download_dlib_pretrained_model,
@@ -147,11 +148,12 @@ def main() -> None:
     if config.face_detector.mode == "dlib":
         download_dlib_pretrained_model()
     if args.mode:
-        if config.mode == "MPIIGaze":
+        mode = GazeEstimationMode(config.mode)
+        if mode is GazeEstimationMode.MPIIGAZE:
             download_mpiigaze_model()
-        elif config.mode == "MPIIFaceGaze":
+        elif mode is GazeEstimationMode.MPIIFACEGAZE:
             download_mpiifacegaze_model()
-        elif config.mode == "ETH-XGaze":
+        else:
             download_ethxgaze_model()
 
     check_path_all(config)

@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+from ptgaze.mode import GazeEstimationMode
+
 from .camera import Camera
 from .face import Face
 
@@ -53,7 +55,7 @@ class FaceModel:
         rot = face.head_pose_rot.as_matrix()
         face.model3d = self.LANDMARKS @ rot.T + face.head_position
 
-    def compute_face_eye_centers(self, face: Face, mode: str) -> None:
+    def compute_face_eye_centers(self, face: Face, mode: GazeEstimationMode) -> None:
         """Compute the centers of the face and eyes.
 
         In the case of MPIIFaceGaze, the face center is defined as the
@@ -65,7 +67,7 @@ class FaceModel:
         """
         if face.model3d is None:
             raise ValueError("model3d is not set")
-        if mode == "ETH-XGaze":
+        if mode is GazeEstimationMode.ETH_XGAZE:
             face.center = face.model3d[np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.NOSE_INDICES])].mean(
                 axis=0
             )

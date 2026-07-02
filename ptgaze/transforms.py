@@ -6,15 +6,16 @@ import torch
 import torchvision.transforms as T  # noqa: N812
 from omegaconf import DictConfig
 
+from .mode import GazeEstimationMode
+
 
 def create_transform(config: DictConfig) -> Callable[[np.ndarray], torch.Tensor]:
-    if config.mode == "MPIIGaze":
+    mode = GazeEstimationMode(config.mode)
+    if mode is GazeEstimationMode.MPIIGAZE:
         return T.ToTensor()
-    if config.mode == "MPIIFaceGaze":
+    if mode is GazeEstimationMode.MPIIFACEGAZE:
         return _create_mpiifacegaze_transform(config)
-    if config.mode == "ETH-XGaze":
-        return _create_ethxgaze_transform(config)
-    raise ValueError
+    return _create_ethxgaze_transform(config)
 
 
 def _create_mpiifacegaze_transform(config: DictConfig) -> Callable:
