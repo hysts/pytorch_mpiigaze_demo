@@ -28,11 +28,13 @@ class FaceModel:
         # face is in front of the camera.
         rvec = np.zeros(3, dtype=float)
         tvec = np.array([0, 0, 1], dtype=float)
+        # The landmarks are detected on the undistorted image, so the
+        # distortion coefficients must not be applied here again.
         _, rvec, tvec = cv2.solvePnP(
             self.LANDMARKS,
             face.landmarks,
             camera.camera_matrix,
-            camera.dist_coefficients,
+            np.zeros((1, 5)),
             rvec,
             tvec,
             useExtrinsicGuess=True,
