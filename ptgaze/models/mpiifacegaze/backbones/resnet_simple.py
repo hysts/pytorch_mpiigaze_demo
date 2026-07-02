@@ -22,11 +22,10 @@ class Model(torchvision.models.ResNet):
         if pretrained_name:
             state_dict = torch.hub.load_state_dict_from_url(torchvision.models.resnet.model_urls[pretrained_name])
             self.load_state_dict(state_dict, strict=False)
-            # While the pretrained models of torchvision are trained
-            # using images with RGB channel order, in this repository
-            # images are treated as BGR channel order.
-            # Therefore, reverse the channel order of the first
-            # convolutional layer.
+            # The torchvision pretrained weights expect RGB input, but
+            # this repository feeds images in BGR channel order, so
+            # reverse the channel order of the first convolutional
+            # layer.
             module = self.conv1
             module.weight.data = module.weight.data[:, [2, 1, 0]]
 

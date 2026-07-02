@@ -7,22 +7,22 @@ from .face_model import FaceModel
 
 @dataclasses.dataclass(frozen=True)
 class FaceModel68(FaceModel):
-    """3D face model for Multi-PIE 68 points mark-up.
+    """3D face model for the Multi-PIE 68-point mark-up.
 
-    In the camera coordinate system, the X axis points to the right from
-    camera, the Y axis points down, and the Z axis points forward.
+    In the camera coordinate system, the X axis points to the right as
+    seen from the camera, the Y axis points down, and the Z axis points
+    forward.
 
-    The face model is facing the camera. Here, the Z axis is
-    perpendicular to the plane passing through the three midpoints of
-    the eyes and mouth, the X axis is parallel to the line passing
-    through the midpoints of both eyes, and the origin is at the tip of
-    the nose.
+    The model axes are aligned with the camera axes, so for a face
+    looking straight at the camera the head pose rotation is the
+    identity. The face looks in the -Z direction of the model
+    coordinate system: the Z axis is perpendicular to the plane passing
+    through the three midpoints of the eyes and mouth, the X axis is
+    parallel to the line passing through the midpoints of both eyes,
+    and the origin is at the tip of the nose.
 
-    The units of the coordinate system are meters and the distance
-    between outer eye corners of the model is set to 90mm.
-
-    The model coordinate system is defined as the camera coordinate
-    system rotated 180 degrees around the Y axis.
+    The unit of the coordinate system is meters, and the distance
+    between the outer eye corners of the model is set to 90 mm.
     """
 
     LANDMARKS: np.ndarray = dataclasses.field(
