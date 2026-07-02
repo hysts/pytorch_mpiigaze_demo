@@ -1,7 +1,3 @@
-import dlib
-import face_alignment
-import face_alignment.detection.sfd
-import mediapipe
 import numpy as np
 from omegaconf import DictConfig
 
@@ -10,21 +6,34 @@ from ptgaze.common import Face
 
 class LandmarkEstimator:
     def __init__(self, config: DictConfig) -> None:
+        # The detector backends are imported lazily so that only the selected
+        # one is loaded. They are heavy imports, and dlib in particular may
+        # not be installed.
         self.mode = config.face_detector.mode
         if self.mode == "dlib":
+            import dlib  # noqa: PLC0415
+
             self.detector = dlib.get_frontal_face_detector()
             self.predictor = dlib.shape_predictor(config.face_detector.dlib_model_path)
         elif self.mode == "face_alignment_dlib":
+            import dlib  # noqa: PLC0415
+            import face_alignment  # noqa: PLC0415
+
             self.detector = dlib.get_frontal_face_detector()
             self.predictor = face_alignment.FaceAlignment(
                 face_alignment.LandmarksType.TWO_D, face_detector="dlib", flip_input=False, device=config.device
             )
         elif self.mode == "face_alignment_sfd":
+            import face_alignment  # noqa: PLC0415
+            import face_alignment.detection.sfd  # noqa: PLC0415
+
             self.detector = face_alignment.detection.sfd.sfd_detector.SFDDetector(device=config.device)
             self.predictor = face_alignment.FaceAlignment(
                 face_alignment.LandmarksType.TWO_D, flip_input=False, device=config.device
             )
         elif self.mode == "mediapipe":
+            import mediapipe  # noqa: PLC0415
+
             self.detector = mediapipe.solutions.face_mesh.FaceMesh(
                 max_num_faces=config.face_detector.mediapipe_max_num_faces,
                 static_image_mode=config.face_detector.mediapipe_static_image_mode,
