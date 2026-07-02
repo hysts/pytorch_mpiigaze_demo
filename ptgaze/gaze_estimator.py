@@ -4,7 +4,8 @@ import numpy as np
 import torch
 from omegaconf import DictConfig
 
-from .common import Camera, Face, FacePartsName
+from .common import Camera, Face, FaceCenters, FaceParts, FacePartsName, HeadPose, NormalizedPatch
+from .common.gaze import denormalize_gaze_vector, gaze_angles_to_vector
 from .head_pose_estimation import HeadPoseNormalizer, LandmarkEstimator
 from .mode import GazeEstimationMode
 from .models import create_model
@@ -45,59 +46,71 @@ class GazeEstimator:
         return self._landmark_estimator.detect_faces(image)
 
     def estimate_gaze(self, image: np.ndarray, face: Face) -> None:
-        self._face_model3d.estimate_head_pose(face, self.camera)
-        self._face_model3d.compute_3d_pose(face)
-        self._face_model3d.compute_face_eye_centers(face, self._mode)
+        head_pose = self._face_model3d.estimate_head_pose(face.landmarks, self.camera)
+        centers = self._face_model3d.compute_centers(head_pose.model3d, self._mode)
+        self._store_head_pose(face, head_pose, centers)
 
         if self._mode.input_is_face:
-            self._head_pose_normalizer.normalize(image, face)
-            self._run_face_model(face)
+            patch = self._head_pose_normalizer.normalize(image, head_pose.rot, centers.face)
+            gaze_angles = self._run_face_model(patch.image)
+            self._store_gaze(face, patch, gaze_angles)
         else:
-            for key in self.EYE_KEYS:
-                eye = getattr(face, key.name.lower())
-                self._head_pose_normalizer.normalize(image, eye)
-            self._run_mpiigaze_model(face)
+            reye_patch = self._head_pose_normalizer.normalize(image, head_pose.rot, centers.reye, grayscale=True)
+            leye_patch = self._head_pose_normalizer.normalize(image, head_pose.rot, centers.leye, grayscale=True)
+            reye_angles, leye_angles = self._run_mpiigaze_model(reye_patch, leye_patch)
+            self._store_gaze(face.reye, reye_patch, reye_angles)
+            self._store_gaze(face.leye, leye_patch, leye_angles)
+
+    @staticmethod
+    def _store_head_pose(face: Face, head_pose: HeadPose, centers: FaceCenters) -> None:
+        face.head_pose_rot = head_pose.rot
+        face.head_position = head_pose.position
+        face.model3d = head_pose.model3d
+        face.center = centers.face
+        face.reye.center = centers.reye
+        face.leye.center = centers.leye
+        face.reye.head_pose_rot = head_pose.rot
+        face.leye.head_pose_rot = head_pose.rot
+
+    @staticmethod
+    def _store_gaze(part: FaceParts, patch: NormalizedPatch, gaze_angles: np.ndarray) -> None:
+        part.normalizing_rot = patch.normalizing_rot
+        part.normalized_head_rot2d = patch.head_rot2d
+        part.normalized_image = patch.image
+        part.normalized_gaze_angles = gaze_angles
+        part.normalized_gaze_vector = gaze_angles_to_vector(gaze_angles)
+        part.gaze_vector = denormalize_gaze_vector(part.normalized_gaze_vector, patch.normalizing_rot)
 
     @torch.no_grad()
-    def _run_mpiigaze_model(self, face: Face) -> None:
+    def _run_mpiigaze_model(
+        self, reye_patch: NormalizedPatch, leye_patch: NormalizedPatch
+    ) -> tuple[np.ndarray, np.ndarray]:
+        # The model works in the left-eye convention, so the right eye is
+        # mirrored on input and the predicted yaw is flipped back.
         images = []
         head_poses = []
-        for key in self.EYE_KEYS:
-            eye = getattr(face, key.name.lower())
-            image = eye.normalized_image
-            normalized_head_pose = eye.normalized_head_rot2d
-            if key == FacePartsName.REYE:
+        for patch, mirror in [(reye_patch, True), (leye_patch, False)]:
+            image = patch.image
+            head_pose = patch.head_rot2d
+            if mirror:
                 image = image[:, ::-1].copy()
-                normalized_head_pose = normalized_head_pose * np.array([1, -1])
-            image = self._transform(image)
-            images.append(image)
-            head_poses.append(normalized_head_pose)
+                head_pose = head_pose * np.array([1, -1])
+            images.append(self._transform(image))
+            head_poses.append(head_pose)
 
         device = torch.device(self._config.device)
         images_tensor = torch.stack(images).to(device)
         head_poses_tensor = torch.from_numpy(np.array(head_poses).astype(np.float32)).to(device)
         predictions = self._gaze_estimation_model(images_tensor, head_poses_tensor)
         predictions = predictions.cpu().numpy()
-
-        for i, key in enumerate(self.EYE_KEYS):
-            eye = getattr(face, key.name.lower())
-            eye.normalized_gaze_angles = predictions[i]
-            if key == FacePartsName.REYE:
-                eye.normalized_gaze_angles *= np.array([1, -1])
-            eye.angle_to_vector()
-            eye.denormalize_gaze_vector()
+        return predictions[0] * np.array([1, -1]), predictions[1]
 
     @torch.no_grad()
-    def _run_face_model(self, face: Face) -> None:
-        if face.normalized_image is None:
-            raise ValueError("normalized_image is not set")
-        image = self._transform(face.normalized_image).unsqueeze(0)
+    def _run_face_model(self, normalized_image: np.ndarray) -> np.ndarray:
+        image = self._transform(normalized_image).unsqueeze(0)
 
         device = torch.device(self._config.device)
         image = image.to(device)
         prediction = self._gaze_estimation_model(image)
         prediction = prediction.cpu().numpy()
-
-        face.normalized_gaze_angles = prediction[0]
-        face.angle_to_vector()
-        face.denormalize_gaze_vector()
+        return prediction[0]

@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation
 from ptgaze.mode import GazeEstimationMode
 
 from .camera import Camera
-from .face import Face
+from .results import FaceCenters, HeadPose
 
 
 @dataclasses.dataclass(frozen=True)
@@ -20,7 +20,7 @@ class FaceModel:
     CHIN_INDEX: int
     NOSE_INDEX: int
 
-    def estimate_head_pose(self, face: Face, camera: Camera) -> None:
+    def estimate_head_pose(self, landmarks2d: np.ndarray, camera: Camera) -> HeadPose:
         """Estimate the head pose by fitting 3D template model."""
         # If the number of the template points is small, cv2.solvePnP
         # becomes unstable, so set the default value for rvec and tvec
@@ -34,7 +34,7 @@ class FaceModel:
         # distortion coefficients must not be applied here again.
         _, rvec, tvec = cv2.solvePnP(
             self.LANDMARKS,
-            face.landmarks,
+            landmarks2d,
             camera.camera_matrix,
             np.zeros((1, 5)),
             rvec,
@@ -43,19 +43,10 @@ class FaceModel:
             flags=cv2.SOLVEPNP_ITERATIVE,
         )
         rot = Rotation.from_rotvec(rvec)
-        face.head_pose_rot = rot
-        face.head_position = tvec
-        face.reye.head_pose_rot = rot
-        face.leye.head_pose_rot = rot
+        model3d = self.LANDMARKS @ rot.as_matrix().T + tvec
+        return HeadPose(rot=rot, position=tvec, model3d=model3d)
 
-    def compute_3d_pose(self, face: Face) -> None:
-        """Compute the transformed model."""
-        if face.head_pose_rot is None:
-            raise ValueError("head_pose_rot is not set")
-        rot = face.head_pose_rot.as_matrix()
-        face.model3d = self.LANDMARKS @ rot.T + face.head_position
-
-    def compute_face_eye_centers(self, face: Face, mode: GazeEstimationMode) -> None:
+    def compute_centers(self, model3d: np.ndarray, mode: GazeEstimationMode) -> FaceCenters:
         """Compute the centers of the face and eyes.
 
         In the case of MPIIFaceGaze, the face center is defined as the
@@ -65,15 +56,16 @@ class FaceModel:
         eyes and the nose. The eye centers are defined as the average
         coordinates of the corners of each eye.
         """
-        if face.model3d is None:
-            raise ValueError("model3d is not set")
         if mode is GazeEstimationMode.ETH_XGAZE:
-            face.center = face.model3d[np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.NOSE_INDICES])].mean(
+            face_center = model3d[np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.NOSE_INDICES])].mean(
                 axis=0
             )
         else:
-            face.center = face.model3d[
-                np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.MOUTH_INDICES])
-            ].mean(axis=0)
-        face.reye.center = face.model3d[self.REYE_INDICES].mean(axis=0)
-        face.leye.center = face.model3d[self.LEYE_INDICES].mean(axis=0)
+            face_center = model3d[np.concatenate([self.REYE_INDICES, self.LEYE_INDICES, self.MOUTH_INDICES])].mean(
+                axis=0
+            )
+        return FaceCenters(
+            face=face_center,
+            reye=model3d[self.REYE_INDICES].mean(axis=0),
+            leye=model3d[self.LEYE_INDICES].mean(axis=0),
+        )

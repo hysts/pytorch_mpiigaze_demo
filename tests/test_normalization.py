@@ -15,7 +15,8 @@ import numpy as np
 import yaml
 from scipy.spatial.transform import Rotation
 
-from ptgaze.common import Camera, FaceParts, FacePartsName
+from ptgaze.common import Camera
+from ptgaze.common.gaze import denormalize_gaze_vector, gaze_angles_to_vector, gaze_vector_to_angles
 from ptgaze.head_pose_estimation import HeadPoseNormalizer
 
 
@@ -43,13 +44,6 @@ def _make_normalizer(
         tmp_path / f"normalized_{focal_norm}_{distance_norm}.yaml", size[0], size[1], focal_norm
     )
     return HeadPoseNormalizer(camera, normalized_camera, distance_norm)
-
-
-def _make_face_part(center: np.ndarray, head_pose_rot: Rotation) -> FaceParts:
-    part = FaceParts(FacePartsName.FACE)
-    part.center = center
-    part.head_pose_rot = head_pose_rot
-    return part
 
 
 def _random_center_and_rotation(rng: np.random.Generator) -> tuple[np.ndarray, Rotation]:
@@ -92,10 +86,8 @@ def test_normalizing_rotation_properties(tmp_path: pathlib.Path) -> None:
     rng = np.random.default_rng(0)
     for _ in range(50):
         center, head_pose_rot = _random_center_and_rotation(rng)
-        part = _make_face_part(center, head_pose_rot)
-        normalizer.normalize(image, part)
-        assert part.normalizing_rot is not None
-        rot_mat = part.normalizing_rot.as_matrix()
+        patch = normalizer.normalize(image, head_pose_rot, center)
+        rot_mat = patch.normalizing_rot.as_matrix()
         # Proper rotation matrix.
         np.testing.assert_allclose(rot_mat @ rot_mat.T, np.eye(3), atol=1e-12)
         assert np.linalg.det(rot_mat) > 0
@@ -112,24 +104,30 @@ def test_normalized_head_pose_matches_mpiigaze_dataset_convention(tmp_path: path
     rng = np.random.default_rng(1)
     for _ in range(50):
         center, head_pose_rot = _random_center_and_rotation(rng)
-        part = _make_face_part(center, head_pose_rot)
-        normalizer.normalize(image, part)
-        assert part.normalized_head_rot2d is not None
+        patch = normalizer.normalize(image, head_pose_rot, center)
         expected = _reference_normalized_head_pose(center, head_pose_rot.as_matrix())
-        np.testing.assert_allclose(part.normalized_head_rot2d, expected, atol=1e-8)
+        np.testing.assert_allclose(patch.head_rot2d, expected, atol=1e-8)
 
 
-def test_angle_to_vector_matches_dataset_convention() -> None:
+def test_grayscale_patch_is_single_channel(tmp_path: pathlib.Path) -> None:
+    normalizer = _make_normalizer(tmp_path, 960.0, 0.6, (60, 36))
+    image = np.zeros((480, 640, 3), dtype=np.uint8)
+    center = np.array([0.05, -0.03, 0.55])
+    head_pose_rot = Rotation.identity()
+    patch = normalizer.normalize(image, head_pose_rot, center, grayscale=True)
+    assert patch.image.shape == (36, 60)
+    color_patch = normalizer.normalize(image, head_pose_rot, center)
+    assert color_patch.image.shape == (36, 60, 3)
+
+
+def test_gaze_angles_to_vector_matches_dataset_convention() -> None:
     for pitch_deg in range(-40, 50, 10):
         for yaw_deg in range(-40, 50, 10):
             angles = np.radians([pitch_deg, yaw_deg])
-            part = FaceParts(FacePartsName.FACE)
-            part.normalized_gaze_angles = angles
-            part.angle_to_vector()
-            assert part.normalized_gaze_vector is not None
-            np.testing.assert_allclose(np.linalg.norm(part.normalized_gaze_vector), 1, atol=1e-12)
-            np.testing.assert_allclose(_reference_convert_gaze(part.normalized_gaze_vector), angles, atol=1e-12)
-            np.testing.assert_allclose(FaceParts.vector_to_angle(part.normalized_gaze_vector), angles, atol=1e-12)
+            vector = gaze_angles_to_vector(angles)
+            np.testing.assert_allclose(np.linalg.norm(vector), 1, atol=1e-12)
+            np.testing.assert_allclose(_reference_convert_gaze(vector), angles, atol=1e-12)
+            np.testing.assert_allclose(gaze_vector_to_angles(vector), angles, atol=1e-12)
 
 
 def test_denormalize_gaze_vector_inverts_normalizing_rotation() -> None:
@@ -138,12 +136,8 @@ def test_denormalize_gaze_vector_inverts_normalizing_rotation() -> None:
         normalizing_rot = Rotation.from_euler("XYZ", rng.uniform(-30, 30, 3), degrees=True)
         gaze_cam = rng.normal(size=3)
         gaze_cam /= np.linalg.norm(gaze_cam)
-        part = FaceParts(FacePartsName.FACE)
-        part.normalizing_rot = normalizing_rot
-        part.normalized_gaze_vector = normalizing_rot.as_matrix() @ gaze_cam
-        part.denormalize_gaze_vector()
-        assert part.gaze_vector is not None
-        np.testing.assert_allclose(part.gaze_vector, gaze_cam, atol=1e-12)
+        gaze_norm = normalizing_rot.as_matrix() @ gaze_cam
+        np.testing.assert_allclose(denormalize_gaze_vector(gaze_norm, normalizing_rot), gaze_cam, atol=1e-12)
 
 
 def test_equivalent_normalized_camera_parameters_produce_identical_warp(tmp_path: pathlib.Path) -> None:
@@ -160,10 +154,8 @@ def test_equivalent_normalized_camera_parameters_produce_identical_warp(tmp_path
     warped = []
     for focal_norm, distance_norm in [(960.0, 0.6), (480.0, 0.3), (1600.0, 1.0)]:
         normalizer = _make_normalizer(tmp_path, focal_norm, distance_norm, (224, 224))
-        part = _make_face_part(center, head_pose_rot)
-        normalizer.normalize(image, part)
-        assert part.normalized_image is not None
-        warped.append(part.normalized_image.astype(np.int16))
+        patch = normalizer.normalize(image, head_pose_rot, center)
+        warped.append(patch.image.astype(np.int16))
 
     for other in warped[1:]:
         assert np.abs(warped[0] - other).max() <= 1
