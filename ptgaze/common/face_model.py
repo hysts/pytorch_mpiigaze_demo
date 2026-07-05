@@ -40,6 +40,10 @@ class FaceModel:
             useExtrinsicGuess=True,
             flags=cv2.SOLVEPNP_ITERATIVE,
         )
+        # OpenCV 5 returns rvec and tvec as (3, 1) even when the initial
+        # values are passed as (3,).
+        rvec = np.asarray(rvec, dtype=float).reshape(3)
+        tvec = np.asarray(tvec, dtype=float).reshape(3)
         rot = Rotation.from_rotvec(rvec)
         model3d = self.LANDMARKS @ rot.as_matrix().T + tvec
         return HeadPose(rot=rot, position=tvec, model3d=model3d)

@@ -37,15 +37,21 @@ class Demo:
         self.show_template_model = self.config.demo.show_template_model
 
     def run(self) -> None:
-        if self.config.demo.use_camera or self.config.demo.video_path:
-            self._run_on_video()
-        elif self.config.demo.image_path:
-            self._run_on_image()
-        else:
-            raise ValueError
+        try:
+            if self.config.demo.use_camera or self.config.demo.video_path:
+                self._run_on_video()
+            elif self.config.demo.image_path:
+                self._run_on_image()
+            else:
+                raise ValueError
+        finally:
+            self.gaze_estimator.close()
 
     def _run_on_image(self) -> None:
         image = cv2.imread(self.config.demo.image_path)
+        if image is None:
+            error_msg = f"{self.config.demo.image_path} could not be read as an image."
+            raise RuntimeError(error_msg)
         self._process_image(image)
         if self.visualizer.image is None:
             raise ValueError("image is not set")

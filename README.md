@@ -29,6 +29,8 @@ This program has only been tested on Ubuntu.
 pip install ptgaze
 ```
 
+The default mediapipe face detector downloads its model file (`face_landmarker.task`) to `~/.ptgaze/mediapipe/` on first run. On Linux, mediapipe requires the GLES system libraries (`sudo apt install libgles2` on Ubuntu).
+
 
 ### Run demo
 

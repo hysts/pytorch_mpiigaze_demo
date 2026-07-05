@@ -41,6 +41,24 @@ def download_dlib_pretrained_model() -> None:
         f_out.write(data)
 
 
+def download_mediapipe_face_landmarker() -> None:
+    logger.debug("Called download_mediapipe_face_landmarker()")
+
+    model_dir = pathlib.Path("~/.ptgaze/mediapipe/").expanduser()
+    model_dir.mkdir(exist_ok=True, parents=True)
+    model_path = model_dir / "face_landmarker.task"
+
+    if model_path.exists():
+        logger.debug("MediaPipe face landmarker model %s already exists.", model_path.as_posix())
+        return
+
+    logger.debug("Download the MediaPipe face landmarker model")
+    torch.hub.download_url_to_file(
+        "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+        model_path.as_posix(),
+    )
+
+
 def download_mpiigaze_model() -> pathlib.Path:
     logger.debug("Called download_mpiigaze_model()")
     return pathlib.Path(hf_hub_download("hysts/ptgaze-mpiigaze-resnet-preact", "model.safetensors"))
@@ -61,6 +79,10 @@ def set_dummy_camera_params(config: DictConfig) -> None:
     if config.demo.image_path:
         path = pathlib.Path(config.demo.image_path).expanduser()
         image = cv2.imread(path.as_posix())
+        if image is None:
+            error_msg = f"{path.as_posix()} could not be read as an image."
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
         h, w = image.shape[:2]
     elif config.demo.video_path:
         logger.debug("Open video %s", config.demo.video_path)
@@ -88,6 +110,8 @@ def _expanduser(path: str) -> str:
 def expanduser_all(config: DictConfig) -> None:
     if hasattr(config.face_detector, "dlib_model_path"):
         config.face_detector.dlib_model_path = _expanduser(config.face_detector.dlib_model_path)
+    if hasattr(config.face_detector, "mediapipe_model_path"):
+        config.face_detector.mediapipe_model_path = _expanduser(config.face_detector.mediapipe_model_path)
     config.gaze_estimator.checkpoint = _expanduser(config.gaze_estimator.checkpoint)
     if not config.gaze_estimator.use_dummy_camera_params:
         config.gaze_estimator.camera_params = _expanduser(config.gaze_estimator.camera_params)
@@ -116,6 +140,8 @@ def _check_path(config: DictConfig, key: str) -> None:
 def check_path_all(config: DictConfig) -> None:
     if config.face_detector.mode == "dlib":
         _check_path(config, "face_detector.dlib_model_path")
+    if config.face_detector.mode == "mediapipe":
+        _check_path(config, "face_detector.mediapipe_model_path")
     _check_path(config, "gaze_estimator.checkpoint")
     if not config.gaze_estimator.use_dummy_camera_params:
         _check_path(config, "gaze_estimator.camera_params")

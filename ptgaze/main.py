@@ -13,6 +13,7 @@ from .utils import (
     check_path_all,
     download_dlib_pretrained_model,
     download_ethxgaze_model,
+    download_mediapipe_face_landmarker,
     download_mpiifacegaze_model,
     download_mpiigaze_model,
     expanduser_all,
@@ -164,6 +165,8 @@ def main() -> None:
 
     if config.face_detector.mode == "dlib":
         download_dlib_pretrained_model()
+    if config.face_detector.mode == "mediapipe":
+        download_mediapipe_face_landmarker()
 
     check_path_all(config)
 

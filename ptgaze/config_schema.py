@@ -28,6 +28,7 @@ class ModelConfig:
 class FaceDetectorConfig:
     mode: str = "mediapipe"
     dlib_model_path: str = "~/.ptgaze/dlib/shape_predictor_68_face_landmarks.dat"
+    mediapipe_model_path: str = "~/.ptgaze/mediapipe/face_landmarker.task"
     mediapipe_max_num_faces: int = 3
     mediapipe_static_image_mode: bool = False
 

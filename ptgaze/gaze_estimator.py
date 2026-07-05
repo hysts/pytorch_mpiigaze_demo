@@ -57,6 +57,10 @@ class GazeEstimator:
         model.eval()
         return model
 
+    def close(self) -> None:
+        """Release the face detector resources."""
+        self._landmark_estimator.close()
+
     def detect_faces(self, image: np.ndarray) -> list[Face]:
         return self._landmark_estimator.detect_faces(image)
 
