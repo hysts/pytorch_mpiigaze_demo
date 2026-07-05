@@ -8,7 +8,7 @@ model:
     resnet_block: basic
     resnet_layers: [2, 2, 2]
 face_detector:
-  mode: dlib
+  mode: mediapipe
   dlib_model_path: ~/.ptgaze/dlib/shape_predictor_68_face_landmarks.dat
   mediapipe_max_num_faces: 3
   mediapipe_static_image_mode: false

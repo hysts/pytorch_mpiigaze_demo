@@ -11,12 +11,12 @@ class LandmarkEstimator:
         # not be installed.
         self.mode = config.face_detector.mode
         if self.mode == "dlib":
-            import dlib  # noqa: PLC0415
+            dlib = self._import_dlib()
 
             self.detector = dlib.get_frontal_face_detector()
             self.predictor = dlib.shape_predictor(config.face_detector.dlib_model_path)
         elif self.mode == "face_alignment_dlib":
-            import dlib  # noqa: PLC0415
+            dlib = self._import_dlib()
             import face_alignment  # noqa: PLC0415
 
             self.detector = dlib.get_frontal_face_detector()
@@ -49,6 +49,18 @@ class LandmarkEstimator:
             self.detector = vision.FaceLandmarker.create_from_options(options)
         else:
             raise ValueError
+
+    def _import_dlib(self):  # noqa: ANN202
+        try:
+            import dlib  # noqa: PLC0415
+        except ImportError as e:
+            error_msg = (
+                f"The '{self.mode}' face detector requires dlib, which is an optional "
+                "dependency. Install it with 'pip install ptgaze[dlib]'. Note that dlib "
+                "is built from source and needs CMake and a C++ compiler."
+            )
+            raise RuntimeError(error_msg) from e
+        return dlib
 
     def close(self) -> None:
         """Release the detector resources.

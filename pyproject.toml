@@ -8,7 +8,6 @@ authors = [{ name = "hysts" }]
 urls = { Homepage = "https://github.com/hysts/pytorch_mpiigaze_demo" }
 license = { file = "LICENSE" }
 dependencies = [
-    "dlib>=19.24.8",
     "face-alignment>=1.4.1",
     "huggingface-hub>=0.30.0",
     "mediapipe>=0.10.30",
@@ -22,6 +21,12 @@ dependencies = [
     "torch>=2.7.0",
     "torchvision>=0.22.0",
 ]
+
+[project.optional-dependencies]
+# dlib ships no wheels on PyPI, so installing this extra builds it from
+# source (CMake and a C++ compiler required). Needed only for the dlib and
+# face_alignment_dlib face detectors.
+dlib = ["dlib>=19.24.8"]
 
 [project.scripts]
 ptgaze = "ptgaze.main:main"

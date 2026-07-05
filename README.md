@@ -31,6 +31,12 @@ pip install ptgaze
 
 The default mediapipe face detector downloads its model file (`face_landmarker.task`) to `~/.ptgaze/mediapipe/` on first run. On Linux, mediapipe requires the GLES system libraries (`sudo apt install libgles2` on Ubuntu).
 
+The dlib-based face detectors (`--face-detector dlib` and `--face-detector face_alignment_dlib`) require the optional dlib dependency. dlib ships no prebuilt wheels, so installing it builds from source and needs CMake and a C++ compiler:
+
+```bash
+pip install ptgaze[dlib]
+```
+
 
 ### Run demo
 

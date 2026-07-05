@@ -3,7 +3,7 @@ device: cpu
 model:
   name: resnet_preact
 face_detector:
-  mode: dlib
+  mode: mediapipe
   dlib_model_path: ~/.ptgaze/dlib/shape_predictor_68_face_landmarks.dat
   mediapipe_max_num_faces: 3
   mediapipe_static_image_mode: false
