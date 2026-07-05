@@ -10,11 +10,13 @@ license = { file = "LICENSE" }
 dependencies = [
     "dlib>=19.24.8",
     "face-alignment>=1.4.1",
+    "huggingface-hub>=0.30.0",
     "mediapipe>=0.10.21",
     "numpy>=1.26.4",
     "omegaconf>=2.3.0",
     "opencv-python>=4.11.0.86",
     "pyyaml>=6.0.2",
+    "safetensors>=0.5.3",
     "scipy>=1.15.2",
     "timm>=1.0.15",
     "torch>=2.7.0",
@@ -23,6 +25,7 @@ dependencies = [
 
 [project.scripts]
 ptgaze = "ptgaze.main:main"
+ptgaze-convert = "ptgaze.convert:main"
 
 [build-system]
 requires = ["hatchling"]

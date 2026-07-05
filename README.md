@@ -83,6 +83,24 @@ While processing an image or video, press the following keys in the window to sh
 - `b`: face bounding box
 - `n`: normalized images fed to the model
 
+## Pretrained models
+
+When run with `--mode`, the program downloads the pretrained weights from the Hugging Face Hub into the Hugging Face cache directory on first use:
+
+| Mode | Model repo |
+|------|------------|
+| `mpiigaze` | [hysts/ptgaze-mpiigaze-resnet-preact](https://huggingface.co/hysts/ptgaze-mpiigaze-resnet-preact) |
+| `mpiifacegaze` | [hysts/ptgaze-mpiifacegaze-resnet-simple](https://huggingface.co/hysts/ptgaze-mpiifacegaze-resnet-simple) |
+| `eth-xgaze` | [hysts/ptgaze-eth-xgaze-resnet18](https://huggingface.co/hysts/ptgaze-eth-xgaze-resnet18) |
+
+The weights are stored in the safetensors format, and ptgaze loads safetensors checkpoints only. If you have a `.pth` checkpoint trained with [hysts/pytorch_mpiigaze](https://github.com/hysts/pytorch_mpiigaze), convert it once and point `gaze_estimator.checkpoint` in your config file to the converted file:
+
+```bash
+ptgaze-convert checkpoint.pth model.safetensors --mode mpiigaze
+```
+
+`ptgaze-convert` accepts both the `{"model": state_dict}` checkpoint layout and a bare state dict. With `--mode`, it also validates the state dict against the architecture used by that mode and records the mode in the file metadata.
+
 ## Notes on data normalization
 
 The preprocessing in this repository follows the data normalization scheme that was used to create the training data of each model ([Zhang et al., TPAMI 2019, Section 4.2](https://arxiv.org/abs/1711.09017), [Zhang et al., ETRA 2018](https://perceptualui.org/publications/zhang18_etra.pdf)). A few details are easy to miss:

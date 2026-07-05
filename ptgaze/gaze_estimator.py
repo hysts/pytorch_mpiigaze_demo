@@ -1,8 +1,10 @@
 import logging
+import pathlib
 
 import numpy as np
 import torch
 from omegaconf import DictConfig
+from safetensors.torch import load_file
 
 from .common import Camera, Face, FaceCenters, FaceParts, FacePartsName, HeadPose, NormalizedPatch
 from .common.gaze import denormalize_gaze_vector, gaze_angles_to_vector
@@ -42,8 +44,15 @@ class GazeEstimator:
 
     def _load_model(self) -> torch.nn.Module:
         model = create_model(self._config)
-        checkpoint = torch.load(self._config.gaze_estimator.checkpoint, map_location="cpu")
-        model.load_state_dict(checkpoint["model"])
+        checkpoint_path = pathlib.Path(self._config.gaze_estimator.checkpoint)
+        if checkpoint_path.suffix != ".safetensors":
+            error_msg = (
+                f"Unsupported checkpoint format: {checkpoint_path.name}. "
+                "Only safetensors checkpoints are supported. "
+                "Convert .pth checkpoints with 'ptgaze-convert <input>.pth <output>.safetensors'."
+            )
+            raise ValueError(error_msg)
+        model.load_state_dict(load_file(checkpoint_path))
         model.to(torch.device(self._config.device))
         model.eval()
         return model

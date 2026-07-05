@@ -143,6 +143,16 @@ def main() -> None:
         config.PACKAGE_ROOT = pathlib.Path(__file__).parent.resolve().as_posix()
     elif args.mode:
         config = load_mode_config(args)
+        # In the --mode flow the checkpoint comes from the Hugging Face Hub
+        # cache, so the path is only known after the download.
+        mode = GazeEstimationMode(config.mode)
+        if mode is GazeEstimationMode.MPIIGAZE:
+            checkpoint_path = download_mpiigaze_model()
+        elif mode is GazeEstimationMode.MPIIFACEGAZE:
+            checkpoint_path = download_mpiifacegaze_model()
+        else:
+            checkpoint_path = download_ethxgaze_model()
+        config.gaze_estimator.checkpoint = checkpoint_path.as_posix()
     else:
         raise ValueError("You need to specify one of '--mode' or '--config'.")
     expanduser_all(config)
@@ -154,14 +164,6 @@ def main() -> None:
 
     if config.face_detector.mode == "dlib":
         download_dlib_pretrained_model()
-    if args.mode:
-        mode = GazeEstimationMode(config.mode)
-        if mode is GazeEstimationMode.MPIIGAZE:
-            download_mpiigaze_model()
-        elif mode is GazeEstimationMode.MPIIFACEGAZE:
-            download_mpiifacegaze_model()
-        else:
-            download_ethxgaze_model()
 
     check_path_all(config)
 
