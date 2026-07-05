@@ -2,20 +2,20 @@
 
 [![PyPI version](https://badge.fury.io/py/ptgaze.svg)](https://pypi.org/project/ptgaze/)
 [![Downloads](https://pepy.tech/badge/ptgaze)](https://pepy.tech/project/ptgaze)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hysts/pytorch_mpiigaze_demo/blob/master/demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hysts/pytorch_mpiigaze_demo/blob/main/demo.ipynb)
 [![MIT License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/hysts/pytorch_mpiigaze_demo.svg?style=flat-square&logo=github&label=Stars&logoColor=white)](https://github.com/hysts/pytorch_mpiigaze_demo)
 
 This program runs gaze estimation on images and videos. By default, it uses the video from a webcam.
 
-![ETH-XGaze video01 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/eth-xgaze_video01.gif)
-![ETH-XGaze video02 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/eth-xgaze_video02.gif)
-![ETH-XGaze video03 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/eth-xgaze_video03.gif)
+![ETH-XGaze video01 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/main/assets/results/eth-xgaze_video01.gif)
+![ETH-XGaze video02 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/main/assets/results/eth-xgaze_video02.gif)
+![ETH-XGaze video03 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/main/assets/results/eth-xgaze_video03.gif)
 
-![MPIIGaze video00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/mpiigaze_video00.gif)
-![MPIIFaceGaze video00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/mpiifacegaze_video00.gif)
+![MPIIGaze video00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/main/assets/results/mpiigaze_video00.gif)
+![MPIIFaceGaze video00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/main/assets/results/mpiifacegaze_video00.gif)
 
-![MPIIGaze image00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/master/assets/results/mpiigaze_image00.jpg)
+![MPIIGaze image00 result](https://raw.githubusercontent.com/hysts/pytorch_mpiigaze_demo/main/assets/results/mpiigaze_image00.jpg)
 
 To train models on MPIIGaze and MPIIFaceGaze, use [this repository](https://github.com/hysts/pytorch_mpiigaze). You can also use [this repository](https://github.com/hysts/pl_gaze_estimation) to train a model on the ETH-XGaze dataset.
 
@@ -60,7 +60,7 @@ options:
   -h, --help            show this help message and exit
   --config CONFIG       Config file. When using a config file, all the other
                         commandline arguments are ignored. See
-                        https://github.com/hysts/pytorch_mpiigaze_demo/blob/master/ptgaze/data/configs/eth-xgaze.yaml
+                        https://github.com/hysts/pytorch_mpiigaze_demo/blob/main/ptgaze/data/configs/eth-xgaze.yaml
   --mode {mpiigaze,mpiifacegaze,eth-xgaze}
                         With 'mpiigaze', MPIIGaze model will be used. With
                         'mpiifacegaze', MPIIFaceGaze model will be used. With
@@ -72,7 +72,7 @@ options:
   --image IMAGE         Path to an input image file.
   --video VIDEO         Path to an input video file.
   --camera CAMERA       Camera calibration file. See
-                        https://github.com/hysts/pytorch_mpiigaze_demo/blob/master/ptgaze/data/calib/sample_params.yaml
+                        https://github.com/hysts/pytorch_mpiigaze_demo/blob/main/ptgaze/data/calib/sample_params.yaml
   --output-dir OUTPUT_DIR, -o OUTPUT_DIR
                         If specified, the overlaid video will be saved to this
                         directory.

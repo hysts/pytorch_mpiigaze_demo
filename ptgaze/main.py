@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         help="Config file. When using a config file, all the other "
         "commandline arguments are ignored. "
-        "See https://github.com/hysts/pytorch_mpiigaze_demo/blob/master/ptgaze/data/configs/eth-xgaze.yaml",
+        "See https://github.com/hysts/pytorch_mpiigaze_demo/blob/main/ptgaze/data/configs/eth-xgaze.yaml",
     )
     parser.add_argument(
         "--mode",
@@ -54,7 +54,7 @@ def parse_args() -> argparse.Namespace:
         "--camera",
         type=str,
         help="Camera calibration file. "
-        "See https://github.com/hysts/pytorch_mpiigaze_demo/blob/master/ptgaze/data/calib/sample_params.yaml",
+        "See https://github.com/hysts/pytorch_mpiigaze_demo/blob/main/ptgaze/data/calib/sample_params.yaml",
     )
     parser.add_argument(
         "--output-dir", "-o", type=str, help="If specified, the overlaid video will be saved to this directory."
